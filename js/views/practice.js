@@ -44,10 +44,12 @@ export function mount() {
 }
 
 function start(mode) {
-  const ids = mode === 'due'
+  const ids = (mode === 'due'
     ? due(30)
-    : shuffle(Object.keys(store.state.srs).filter(id => VOCAB_BY_ID[id])).slice(0, 15);
-  const pool = (ids.length ? ids : shuffle(VOCAB.map(v => v.id)).slice(0, 15)).filter(id => VOCAB_BY_ID[id]);
+    : shuffle(Object.keys(store.state.srs)).slice(0, 15)
+  ).filter(id => VOCAB_BY_ID[id]);
+  // Nichts Passendes gefunden? Dann einfach zufällige Wörter – eine leere Runde hilft niemandem.
+  const pool = ids.length ? ids : shuffle(VOCAB.map(v => v.id)).slice(0, 15);
   P = { queue: pool, i: 0, shown: false, initial: pool.length };
   repaint();
 }

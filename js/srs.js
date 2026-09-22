@@ -42,11 +42,14 @@ export function introduce(id) {
   store.set('srs.' + id, { reps: 0, ease: 2.5, interval: 0, due: Date.now(), lapses: 0, seen: 0 });
 }
 
+/** Einträge, die keine Vokabel sind (z. B. Buchstaben aus alten Ständen). */
+const isVocabCard = id => !String(id).includes(':');
+
 /** Fällige Karten, schwierigste zuerst. */
 export function due(limit = 20) {
   const now = Date.now();
   return Object.entries(store.state.srs)
-    .filter(([, c]) => (c.due || 0) <= now)
+    .filter(([id, c]) => isVocabCard(id) && (c.due || 0) <= now)
     .sort((a, b) => (a[1].due || 0) - (b[1].due || 0) || b[1].lapses - a[1].lapses)
     .slice(0, limit)
     .map(([id]) => id);
@@ -54,7 +57,7 @@ export function due(limit = 20) {
 
 export function dueCount() {
   const now = Date.now();
-  return Object.values(store.state.srs).filter(c => (c.due || 0) <= now).length;
+  return Object.entries(store.state.srs).filter(([id, c]) => isVocabCard(id) && (c.due || 0) <= now).length;
 }
 
 /** Grobe Einordnung, wie fest ein Wort sitzt (0–1). */
@@ -65,7 +68,7 @@ export function strength(id) {
 }
 
 export function learnedCount() {
-  return Object.values(store.state.srs).filter(c => c.reps > 0).length;
+  return Object.entries(store.state.srs).filter(([id, c]) => isVocabCard(id) && c.reps > 0).length;
 }
 
 export function statsByDay() {

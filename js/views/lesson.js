@@ -291,9 +291,9 @@ function wire() {
     if (c.type === 'build') wireBuild(root, c);
     if (c.type === 'type') wireType(root);
   }
-  if (['intro', 'letter-intro'].includes(c.type)) {
-    introduce(c.item?.id || ('L:' + c.letter.low));
-  }
+  // Nur Vokabeln wandern in den Karteikasten – Buchstaben werden über die
+  // Lektion selbst abgedeckt und hätten die Wiederholung sonst verstopft.
+  if (c.type === 'intro' && c.item) introduce(c.item.id);
 }
 
 function wireBuild(root, c) {
