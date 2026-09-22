@@ -10,45 +10,54 @@ offline nutzbar, kein App Store, kein Konto, keine Server.
 
 ## Auf dem iPhone installieren
 
-### 1. Die App veröffentlichen (einmalig, ~2 Minuten)
+Alles lässt sich direkt am Handy erledigen — aber **nicht in der GitHub-App**.
+Die App kann keine Repository-Einstellungen. Öffne github.com stattdessen in **Safari**.
 
-Die App besteht nur aus statischen Dateien und kann direkt über GitHub Pages laufen:
+### Schritt 1 — Die App einschalten (einmalig)
 
-1. Auf GitHub im Repository auf **Settings → Pages** gehen.
-2. Unter **Build and deployment → Source** den Eintrag **GitHub Actions** wählen.
-3. Fertig. Der mitgelieferte Workflow (`.github/workflows/pages.yml`) veröffentlicht die App
-   bei jedem Push automatisch.
+1. In **Safari** `github.com/pascal199066-star/Sprach-App` öffnen und anmelden.
+2. Oben auf **Settings** tippen (Zahnrad-Reiter; ganz rechts in der Reiterleiste,
+   eventuell muss die Leiste seitlich gescrollt werden).
+3. In der linken Liste nach unten zu **Pages** scrollen.
+4. Unter **Build and deployment → Source** steht **Deploy from a branch**. So lassen.
+5. Darunter bei **Branch** auf **None** tippen und
+   `claude/azerbaijani-learning-app-ios-fjv65u` auswählen, Ordner auf **/ (root)** lassen.
+6. **Save** tippen.
 
-Die Adresse lautet danach:
+Nach ein bis zwei Minuten erscheint auf derselben Seite oben ein grüner Kasten mit
+der Adresse der App — ungefähr so:
 
 ```
-https://<dein-github-name>.github.io/Sprach-App/
+https://pascal199066-star.github.io/Sprach-App/
 ```
 
-> Alternative ohne GitHub Pages: den Ordner auf einen beliebigen Webspace legen.
-> Wichtig ist nur **HTTPS** — Sprachausgabe, Mikrofon und Offline-Betrieb setzen das voraus.
+Diese Adresse ist die App. Lädt sie noch nicht: eine Minute warten und neu laden.
 
-### 2. Zum Home-Bildschirm hinzufügen
+### Schritt 2 — Aufs Home-Bildschirm legen
 
-1. Die Adresse in **Safari** öffnen (nicht Chrome — nur Safari kann auf iOS installieren).
-2. Auf das **Teilen-Symbol** tippen (Quadrat mit Pfeil nach oben).
-3. **„Zum Home-Bildschirm“** wählen → **Hinzufügen**.
+1. Die Adresse in **Safari** öffnen.
+2. Unten auf das **Teilen-Symbol** tippen (Quadrat mit Pfeil nach oben).
+3. In der Liste nach unten wischen zu **„Zum Home-Bildschirm"** → **Hinzufügen**.
 
-Ab jetzt startet die App wie eine native App im Vollbild, ganz ohne Safari-Leiste,
-und funktioniert auch ohne Internet.
+Jetzt liegt ein App-Icon auf dem Home-Bildschirm. Von dort gestartet läuft die App
+im Vollbild ohne Safari-Leisten — und auch ohne Internet.
 
-### 3. Die Stimme aktivieren (wichtig!)
+### Schritt 3 — Die Stimme laden (wichtig!)
 
 iOS bringt keine aserbaidschanische Stimme mit. Türkisch und Aserbaidschanisch sind
-lautlich aber nahezu deckungsgleich, deshalb nutzt die App die türkische Systemstimme.
-Falls noch keine installiert ist:
+lautlich aber nahezu deckungsgleich, deshalb nutzt die App die türkische Systemstimme:
 
 **Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Türkisch → Laden**
 
-Danach die App neu öffnen. Unter **Mehr → Einstellungen** lässt sich die Stimme
-auswählen und das Sprechtempo anpassen.
+Danach die App einmal schließen und neu öffnen. Unter **Mehr → Einstellungen** lassen
+sich Stimme und Sprechtempo anpassen.
 
----
+> **Hinweis:** Die Seite ist öffentlich erreichbar, sobald sie eingeschaltet ist —
+> so funktioniert GitHub Pages. Es stehen keine persönlichen Daten darin, der
+> Lernstand bleibt allein auf deinem iPhone.
+
+> **Später:** Wird der Branch irgendwann nach `main` zusammengeführt, unter
+> **Pages → Branch** einfach auf `main` umstellen. Die Adresse bleibt gleich.
 
 ## Was die App kann
 
