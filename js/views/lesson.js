@@ -34,6 +34,7 @@ export function render(params) {
 }
 
 export function mount() {
+  // Haken für den automatisierten Durchlauf (nur mit ?e2e=1 in der Adresse)
   if (location.search.includes('e2e')) window.__answer = () => S.cards[S.i]?.answer;
   wire();
   autoPlay();
