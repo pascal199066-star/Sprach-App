@@ -5,7 +5,8 @@ const KEY = 'azaz.state.v1';
 const DEFAULTS = {
   settings: {
     rate: 0.9,
-    voiceURI: null,
+    voice: 'f',           // Aufnahme-Stimme: 'f' (Banu) oder 'm' (Babək)
+    voiceURI: null,       // Ersatz-Systemstimme, falls keine Aufnahme da ist
     dailyGoal: 20,        // XP pro Tag
     showPhonetic: true,   // Lautschrift einblenden
     autoPlay: true,       // Audio bei neuen Wörtern automatisch abspielen

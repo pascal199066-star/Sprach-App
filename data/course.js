@@ -11,7 +11,7 @@
  */
 export const UNITS = [
   {
-    id: 'u1', title: 'Erste Worte', icon: '👋', hue: 168,
+    id: 'u1', title: 'Erste Worte', icon: 'wave', hue: 168,
     desc: 'Begrüßen, danken, verabschieden – und das Alphabet.',
     lessons: [
       { id: 'u1l1', kind: 'alphabet', title: 'Das Alphabet, Teil 1', letters: ['a','b','c','ç','d','e','ə','f','g','ğ','h','x'] },
@@ -27,7 +27,7 @@ export const UNITS = [
     ]
   },
   {
-    id: 'u2', title: 'Wer bist du?', icon: '🙋', hue: 205,
+    id: 'u2', title: 'Wer bist du?', icon: 'user', hue: 205,
     desc: 'Name, Herkunft, Alter – und die Personalendungen.',
     lessons: [
       { id: 'u2l1', kind: 'vocab', title: 'Name & Vorstellung', items: ['i01','i02','i03','i07'] },
@@ -41,7 +41,7 @@ export const UNITS = [
     ]
   },
   {
-    id: 'u3', title: 'Zahlen & Familie', icon: '👨‍👩‍👧', hue: 28,
+    id: 'u3', title: 'Zahlen & Familie', icon: 'users', hue: 28,
     desc: 'Zählen, Alter angeben, über Familie sprechen.',
     lessons: [
       { id: 'u3l1', kind: 'vocab', title: 'Zahlen 0–10', items: ['n00','n01','n02','n03','n04','n05','n06','n07','n08','n09','n10'] },
@@ -55,7 +55,7 @@ export const UNITS = [
     ]
   },
   {
-    id: 'u4', title: 'Essen & Einkaufen', icon: '🍽️', hue: 350,
+    id: 'u4', title: 'Essen & Einkaufen', icon: 'cup', hue: 350,
     desc: 'Im Restaurant bestellen, auf dem Basar handeln.',
     lessons: [
       { id: 'u4l1', kind: 'vocab', title: 'Getränke & Grundnahrung', items: ['d01','d02','d03','d04','d09','d15','d14'] },
@@ -65,11 +65,12 @@ export const UNITS = [
       { id: 'u4l5', kind: 'vocab', title: 'Preise & Bezahlen', items: ['s01','s02','s03','s04','s05','s09','s10','s11'] },
       { id: 'u4l6', kind: 'vocab', title: 'Im Geschäft', items: ['s06','s07','s08','s12','b13','b14','b15','b16'] },
       { id: 'u4l7', kind: 'dialog', title: 'Dialog: Im Teehaus', dialog: 'dlg3' },
+      { id: 'u4l9', kind: 'dialog', title: 'Dialog: Auf dem Basar', dialog: 'dlg5' },
       { id: 'u4l8', kind: 'review', title: 'Wiederholung Einheit 4' }
     ]
   },
   {
-    id: 'u5', title: 'Unterwegs', icon: '🧭', hue: 265,
+    id: 'u5', title: 'Unterwegs', icon: 'compass', hue: 265,
     desc: 'Nach dem Weg fragen, Verkehrsmittel, Notfälle.',
     lessons: [
       { id: 'u5l1', kind: 'vocab', title: 'Richtungen', items: ['t01','t02','t03','t04','t05','b07'] },
@@ -78,11 +79,12 @@ export const UNITS = [
       { id: 'u5l4', kind: 'vocab', title: 'Nach dem Weg fragen', items: ['t12','t13','t14','t15','t16','b20'] },
       { id: 'u5l5', kind: 'grammar', title: 'Grammatik: Fragen stellen', grammar: 'gr09', items: ['b05','b06','b08','b09','b10','b11'] },
       { id: 'u5l6', kind: 'dialog', title: 'Dialog: Nach dem Weg fragen', dialog: 'dlg4' },
+      { id: 'u5l8', kind: 'dialog', title: 'Dialog: Im Taxi', dialog: 'dlg6' },
       { id: 'u5l7', kind: 'review', title: 'Wiederholung Einheit 5' }
     ]
   },
   {
-    id: 'u6', title: 'Alltag & Small Talk', icon: '💬', hue: 120,
+    id: 'u6', title: 'Alltag & Small Talk', icon: 'chat', hue: 120,
     desc: 'Gefühle, Wetter, Zeit – und die Vergangenheit.',
     lessons: [
       { id: 'u6l1', kind: 'vocab', title: 'Wie fühlst du dich?', items: ['e01','e02','e03','e04','e05','e06','e09','e11','e12'] },

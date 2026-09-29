@@ -1,27 +1,22 @@
 /** Alphabet-Übersicht und Buchstaben-Detail. */
 import { ALPHABET, TRICKY } from '../../data/alphabet.js';
-import { esc, md } from '../ui.js';
-import { speakBtn, backBar } from '../components.js';
+import { VOCAB } from '../../data/vocab.js';
+import { esc } from '../ui.js';
+import { speakBtn, backBar, pageHead, icon, callout } from '../components.js';
 
 export function render(params) {
   if (params.id) return detail(decodeURIComponent(params.id));
 
   return `<div class="view">
-    <h1>Alphabet</h1>
-    <p class="sub">32 Buchstaben. Jeder wird immer gleich gesprochen – anders als im Deutschen gibt es keine Ausnahmen.</p>
-
-    <div class="card tight" style="margin:14px 0">
-      <div class="row"><div style="font-size:22px">💡</div>
-      <div class="grow" style="font-size:14.5px">Die acht hervorgehobenen Buchstaben sind die, bei denen Deutsche am häufigsten danebenliegen. Tippe einen Buchstaben für Details.</div></div>
-    </div>
-
+    ${pageHead('Alphabet', '32 Buchstaben – und jeder wird immer gleich gesprochen. Keine Ausnahmen wie im Deutschen.')}
+    <div class="legend"><i></i>Diese Buchstaben klingen anders, als Deutsche erwarten.</div>
     <div class="letters">
-      ${ALPHABET.map(l => `<a class="letter ${TRICKY.includes(l.low) ? 'tricky' : ''}" href="#/alphabet/${encodeURIComponent(l.low)}" style="text-decoration:none;color:inherit">
-        <b>${l.up} ${l.low}</b>
-        <small>„${esc(l.ph)}“</small>
+      ${ALPHABET.map(l => `<a class="letter ${TRICKY.includes(l.low) ? 'tricky' : ''}" href="#/alphabet/${encodeURIComponent(l.low)}">
+        <b>${l.up}${l.low}</b>
+        <small>${esc(l.ph)}</small>
       </a>`).join('')}
     </div>
-    <div style="height:16px"></div>
+    ${callout('info', 'Lautschrift lesen', 'Unter den Wörtern steht eine deutsche Lautschrift. **GROSS** geschrieben ist die betonte Silbe, **ß** steht für das scharfe s. Mehr dazu unter **Mehr → Aussprache-Hilfe**.')}
   </div>`;
 }
 
@@ -31,37 +26,38 @@ function detail(low) {
   const l = ALPHABET[i];
   const prev = ALPHABET[i - 1], next = ALPHABET[i + 1];
 
+  // Wörter aus dem Kurs, die diesen Buchstaben enthalten – kurze zuerst
+  const words = VOCAB.filter(v => !v.az.includes(' ') && v.az.toLowerCase().includes(l.low) && v.az !== l.ex)
+    .sort((a, b) => a.az.length - b.az.length).slice(0, 5);
+  const examples = [{ az: l.ex, de: l.exDe }, ...(l.more || []), ...words.map(v => ({ az: v.az, de: v.de }))]
+    .filter((x, n, arr) => arr.findIndex(y => y.az === x.az) === n).slice(0, 7);
+
   return `<div class="view">
-    ${backBar('Buchstabe', '#/alphabet')}
+    ${backBar(`Buchstabe ${l.up}`, '#/alphabet', `${i + 1} von ${ALPHABET.length}`)}
     <div class="card letter-hero">
-      <div class="big">${l.up} ${l.low}</div>
+      <div class="big">${l.up}<span> ${l.low}</span></div>
       <div class="ipa">klingt wie <b>„${esc(l.ph)}“</b> · ${esc(l.ipa)}</div>
     </div>
 
-    <div class="note"><b>Merke:</b> ${md(l.tip)}</div>
+    ${callout('tip', 'Merke', l.tip)}
 
-    <h2>Beispielwort</h2>
-    <div class="card row">
-      ${speakBtn(l.ex, { size: 'lg' })}
-      <div class="grow">
-        <div class="az" style="font-size:24px">${esc(l.ex)}</div>
-        <div class="muted">${esc(l.exDe)}</div>
-      </div>
-      ${speakBtn(l.ex, { slow: true })}
-    </div>
-
-    <h2>Alle Wörter mit „${l.low}“</h2>
+    <div class="sec-h">${icon('speaker')}<h2>Zum Anhören</h2></div>
     <div class="card">
-      ${ALPHABET.filter(x => x.ex.includes(l.low) && x.low !== l.low).slice(0, 6).map(x => `
-        <div class="vocab-item">${speakBtn(x.ex)}
-          <div class="grow"><div class="az">${esc(x.ex)}</div><div class="de">${esc(x.exDe)}</div></div>
-        </div>`).join('') || '<p class="muted" style="margin:0">Keine weiteren Beispiele.</p>'}
+      ${examples.map(x => `<div class="vocab-item">${speakBtn(x.az)}
+        <div class="grow"><div class="az">${highlight(x.az, l.low)}</div><div class="de">${esc(x.de)}</div></div>
+        ${speakBtn(x.az, { slow: true })}
+      </div>`).join('')}
     </div>
 
-    <div class="row" style="gap:8px;margin-top:8px">
-      ${prev ? `<a class="btn ghost grow" href="#/alphabet/${encodeURIComponent(prev.low)}" style="text-decoration:none">‹ ${prev.up} ${prev.low}</a>` : '<div class="grow"></div>'}
-      ${next ? `<a class="btn ghost grow" href="#/alphabet/${encodeURIComponent(next.low)}" style="text-decoration:none">${next.up} ${next.low} ›</a>` : '<div class="grow"></div>'}
+    <div class="row" style="gap:10px;margin-top:6px">
+      ${prev ? `<a class="btn ghost grow" href="#/alphabet/${encodeURIComponent(prev.low)}">${icon('chevL')} ${prev.up}${prev.low}</a>` : '<div class="grow"></div>'}
+      ${next ? `<a class="btn ghost grow" href="#/alphabet/${encodeURIComponent(next.low)}">${next.up}${next.low} ${icon('chevR')}</a>` : '<div class="grow"></div>'}
     </div>
-    <div style="height:16px"></div>
   </div>`;
+}
+
+/** Den Buchstaben im Wort farbig hervorheben. */
+function highlight(word, low) {
+  return [...word].map(ch => ch.toLowerCase() === low || (low === 'i' && ch === 'İ') || (low === 'ı' && ch === 'I')
+    ? `<span style="color:var(--nar)">${esc(ch)}</span>` : esc(ch)).join('');
 }

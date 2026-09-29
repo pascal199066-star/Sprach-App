@@ -21,7 +21,7 @@ Die App kann keine Repository-Einstellungen. Öffne github.com stattdessen in **
 3. In der linken Liste nach unten zu **Pages** scrollen.
 4. Unter **Build and deployment → Source** steht **Deploy from a branch**. So lassen.
 5. Darunter bei **Branch** auf **None** tippen und
-   `claude/azerbaijani-learning-app-ios-fjv65u` auswählen, Ordner auf **/ (root)** lassen.
+   `claude/happy-tesla-slf8t4` auswählen (die überarbeitete Version), Ordner auf **/ (root)** lassen.
 6. **Save** tippen.
 
 Nach ein bis zwei Minuten erscheint auf derselben Seite oben ein grüner Kasten mit
@@ -42,15 +42,15 @@ Diese Adresse ist die App. Lädt sie noch nicht: eine Minute warten und neu lade
 Jetzt liegt ein App-Icon auf dem Home-Bildschirm. Von dort gestartet läuft die App
 im Vollbild ohne Safari-Leisten — und auch ohne Internet.
 
-### Schritt 3 — Die Stimme laden (wichtig!)
+### Schritt 3 — Nur falls nötig: Ersatzstimme laden
 
-iOS bringt keine aserbaidschanische Stimme mit. Türkisch und Aserbaidschanisch sind
-lautlich aber nahezu deckungsgleich, deshalb nutzt die App die türkische Systemstimme:
+Die App bringt echte aserbaidschanische Aufnahmen mit (siehe unten). Nur für Sätze
+ohne Aufnahme springt die Stimme des iPhones ein – dafür einmalig laden:
 
 **Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Türkisch → Laden**
 
-Danach die App einmal schließen und neu öffnen. Unter **Mehr → Einstellungen** lassen
-sich Stimme und Sprechtempo anpassen.
+Unter **Mehr → Einstellungen** lassen sich Stimme (Banu oder Babək) und Sprechtempo
+anpassen und alle Aufnahmen für den Offline-Betrieb speichern.
 
 > **Hinweis:** Die Seite ist öffentlich erreichbar, sobald sie eingeschaltet ist —
 > so funktioniert GitHub Pages. Es stehen keine persönlichen Daten darin, der
@@ -63,41 +63,59 @@ sich Stimme und Sprechtempo anpassen.
 
 | Bereich | Inhalt |
 |---|---|
-| **Kurs** | 6 Einheiten, 49 Lektionen — vom Alphabet bis zum Smalltalk |
-| **Alphabet** | Alle 32 Buchstaben mit Lautschrift, Beispielwort und Hinweisen für Deutsche |
-| **Wortschatz** | 198 Wörter und Wendungen in 11 Themengebieten, alle vertont |
+| **Kurs** | 6 Einheiten, 51 Lektionen – vom Alphabet bis zum Smalltalk |
+| **Alphabet** | Alle 32 Buchstaben mit Lautschrift, Merkregel und je mehreren Hörbeispielen |
+| **Wortschatz** | 198 Wörter und Wendungen in 11 Themen, Sätze mit Zerlegung in ihre Bausteine |
 | **Grammatik** | 11 kompakte Kapitel: Vokalharmonie, Fälle, Zeiten, Satzbau, Höflichkeit |
-| **Dialoge** | 4 Alltagsszenen, zeilenweise oder am Stück anhörbar |
-| **Aussprache** | Wort anhören, selbst aufnehmen, direkt vergleichen |
+| **Dialoge** | 6 Alltagsszenen mit verteilten Stimmen, Hörverstehen-Modus |
+| **Aussprache** | Echte Aufnahmen, Trainer mit eigener Aufnahme, Aussprache-Hilfe mit Lautschrift-Legende |
 | **Wiederholen** | Karteikasten mit verteiltem Lernen (SM-2), meldet fällige Wörter |
 | **Fortschritt** | Streak, Tagesziel, XP, Statistik nach Themen |
 
-### Übungstypen
+### Übungstypen und Hilfen
 
 Aus dem Wortschatz baut die App automatisch sechs Übungsformen:
 Wort einführen · Bedeutung wählen · Übersetzung wählen · Hörverstehen ·
-Satz aus Bausteinen zusammensetzen · frei tippen (mit Sonderzeichen-Tastenreihe für `ə ı ö ü ç ş ğ q x`).
+Satz aus Bausteinen zusammensetzen · frei tippen (mit Tastenreihe für `ə ı ö ü ç ş ğ q x`).
 
-Falsch beantwortete Aufgaben kommen am Ende der Lektion noch einmal.
+- **Tipp-Knopf** in jeder Übung: 50:50, nächster Buchstabe oder nächster Baustein.
+  Mit Tipp gibt es weniger XP, und das Wort kommt früher wieder.
+- **Erklärte Fehler:** Die falsche Stelle wird markiert. Bei verwechselten Buchstaben
+  (`e`/`ə`, `g`/`q`, `h`/`x`, `i`/`ı` …) nennt die App die Ausspracheregel.
+  Türkische Schreibweisen gelten nie als richtig.
+- **Was hast du gewählt?** Bei einer falschen Auswahl zeigt die App, was die gewählte
+  Antwort bedeutet.
+- **Bausteine:** Sätze werden in Wortteile zerlegt, z. B. *Almaniya · -dan · -am* =
+  Deutschland · aus · ich bin.
+- **Aussprache-Tipps** direkt am Wort für die Stolperlaute.
+
+Falsch beantwortete Aufgaben kommen am Ende der Lektion noch einmal. Die
+Zusammenfassung listet die Wörter, die du dir noch einmal ansehen solltest.
 
 ---
 
 ## Wie die Aussprache funktioniert
 
-Die App spricht mit der türkischen Systemstimme, passt den Text vorher aber an
-den aserbaidschanischen Lautbestand an:
+iOS bringt keine aserbaidschanische Stimme mit, und die türkische Stimme klingt
+hörbar türkisch: Sie kennt kein `ə`, kein `x`, verschluckt das `ğ` und betont anders.
+Deshalb liefert die App **fertige Aufnahmen** mit, erzeugt mit den neuronalen
+aserbaidschanischen Stimmen von Microsoft (`az-AZ-BanuNeural`, `az-AZ-BabekNeural`).
+Die Aufnahmen liegen als MP3 in `audio/`, funktionieren offline und lassen sich
+langsamer abspielen.
 
-| Aserbaidschanisch | wird gesprochen als | Laut |
-|---|---|---|
-| `ə` | `e` | offenes ä wie in „Bär“ |
-| `q` | `g` | wie deutsches g |
-| `x` | `h` | ch wie in „Bach“ (nächste Annäherung) |
+```bash
+pip install edge-tts
+node tools/collect-audio.mjs     # sammelt alle Texte aus data/
+python3 tools/make_audio.py      # erzeugt fehlende Aufnahmen + audio/manifest.json
+```
 
-Beispiel: `Bağışlayın, qapı xoşdur` → `Bağışlayın, gapı hoşdur`
+Der Dateiname ist ein Hash des Textes. Nach neuen oder geänderten Wörtern einfach
+beide Befehle erneut ausführen, vorhandene Aufnahmen werden übersprungen.
 
-Findet die App eine echte `az`-Stimme (manche Android-Geräte, künftige iOS-Versionen),
-nutzt sie diese automatisch und ohne Umschreibung. Zusätzlich steht unter jedem Wort
-eine deutsche Lautschrift — bei `ə`, `q` und `x` ist sie genauer als die Stimme.
+Fehlt für einen Satz eine Aufnahme, spricht die Systemstimme als Notlösung
+(aserbaidschanisch, falls vorhanden, sonst türkisch mit angenähertem Text). Unter
+jedem Wort steht zusätzlich eine deutsche Lautschrift. Wie man sie liest, erklärt
+**Mehr → Aussprache-Hilfe**.
 
 ---
 
@@ -110,17 +128,21 @@ sw.js                   Service Worker – macht alles offline verfügbar
 css/app.css             Design, helles und dunkles Erscheinungsbild
 js/
   app.js                Einstieg: Router, Tableiste, globale Audio-Knöpfe
-  speech.js             Sprachausgabe inkl. Umschrift für die türkische Stimme
+  speech.js             Aufnahmen abspielen, sonst Systemstimme
+  audio-key.js          Dateinamen der Aufnahmen (von App und Werkzeug geteilt)
   store.js              Fortschritt & Einstellungen (localStorage)
   srs.js                Verteiltes Wiederholen (SM-2, vereinfacht)
   lesson-engine.js      Erzeugt die Übungen aus den Kursdaten
+  components.js         Symbole und wiederverwendbare Bausteine
   views/                Die einzelnen Ansichten
 data/
-  alphabet.js           32 Buchstaben
-  vocab.js              198 Wörter und Wendungen
+  alphabet.js           32 Buchstaben mit Hörbeispielen
+  vocab.js              198 Wörter und Wendungen mit Bausteinen
   grammar.js            11 Grammatikkapitel
   course.js             Kursaufbau: Einheiten und Lektionen
-  dialogues.js          4 Dialoge
+  dialogues.js          6 Dialoge
+audio/                  Aufnahmen (f = Banu, m = Babək) + manifest.json
+tools/                  Werkzeuge zum Erzeugen der Aufnahmen
 ```
 
 Kein Build-Schritt, keine Abhängigkeiten — reines ES-Modul-JavaScript.
@@ -129,7 +151,7 @@ Kein Build-Schritt, keine Abhängigkeiten — reines ES-Modul-JavaScript.
 
 Neues Wort in `data/vocab.js` eintragen (die `id` nie nachträglich ändern, daran hängt
 der Lernfortschritt) und die `id` in `data/course.js` einer Lektion zuordnen.
-Die Übungen entstehen daraus von selbst.
+Die Übungen entstehen daraus von selbst. Danach die Aufnahmen neu erzeugen (siehe oben).
 
 ### Lokal ausprobieren
 

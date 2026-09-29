@@ -17,7 +17,7 @@ export const GRAMMAR = [
       { t: 'rule', title: 'Kein Geschlecht', text: 'Es gibt kein der/die/das. **o** heißt gleichzeitig „er“, „sie“ und „es“.' },
       { t: 'rule', title: 'Keine Artikel', text: '„das Haus“ und „ein Haus“ heißen beide einfach **ev**.' },
       { t: 'rule', title: 'Keine unregelmäßigen Verben', text: 'Jedes Verb folgt demselben Baukasten. Wenn du das System einmal hast, kannst du jedes Verb bilden.' },
-      { t: 'rule', title: 'Keine Präpositionen', text: 'Statt „in dem Haus“ hängt man eine Endung an: **evdə**. Das Wort bleibt vorne, die Info kommt hinten dran.' },
+      { t: 'rule', title: 'Keine Präpositionen', text: 'Statt „in dem Haus“ hängt man eine Endung an: **evdə**. Das Wort bleibt vorne, die Info kommt hinten dran. Wo Endungen nicht reichen, stehen kleine Wörter **nach** dem Nomen: `dost ilə` – mit einem Freund.' },
       { t: 'p', text: 'Der Preis dafür: Aserbaidschanisch ist eine **agglutinierende** Sprache. Man klebt Silbe für Silbe an den Wortstamm. Ein einziges Wort kann ein ganzer deutscher Satz sein.' },
       { t: 'ex', items: [
         { az: 'ev', de: 'Haus' },
@@ -206,13 +206,14 @@ export const GRAMMAR = [
     subtitle: 'Die Partikel -mı und die Fragewörter',
     minutes: 4,
     blocks: [
-      { t: 'p', text: 'Ja/Nein-Fragen bildest du mit der angehängten Partikel **-mı / -mi / -mu / -mü** (Viererharmonie). Die Wortstellung ändert sich nicht.' },
+      { t: 'p', text: 'Ja/Nein-Fragen bildest du mit der Partikel **-mı / -mi / -mu / -mü** (Viererharmonie). Sie kommt ganz ans Ende – **hinter** die Personalendung. Die Wortstellung ändert sich nicht.' },
       { t: 'ex', items: [
-        { az: 'Sən almansan? / Almanmısan?', de: 'Bist du Deutscher?' },
-        { az: 'Çay içirsən?', de: 'Trinkst du Tee?' },
-        { az: 'Bakıdasınız?', de: 'Sind Sie in Baku?' }
+        { az: 'Sən almansanmı?', de: 'Bist du Deutscher?' },
+        { az: 'Çay içirsənmi?', de: 'Trinkst du Tee?' },
+        { az: 'Siz Bakıdasınızmı?', de: 'Sind Sie in Baku?' }
       ]},
-      { t: 'p', text: 'Umgangssprachlich lässt man die Partikel oft weg und hebt nur die Stimme – wie im Deutschen bei „Du kommst mit?“.' },
+      { t: 'rule', title: 'Anders als im Türkischen', text: 'Im Türkischen steht die Frage-Partikel vor der Personalendung („Alman **mı**sın?“). Im Aserbaidschanischen kommt sie **danach**: „Almansan**mı**?“' },
+      { t: 'p', text: 'Im Gespräch lässt man die Partikel meist weg und hebt nur die Stimme – wie im Deutschen bei „Du kommst mit?“: `Çay içirsən?`' },
       { t: 'table', head: ['Fragewort', 'Deutsch'], rows: [
         ['nə', 'was'], ['kim', 'wer'], ['harada', 'wo'], ['hara', 'wohin'],
         ['haradan', 'woher'], ['nə vaxt', 'wann'], ['niyə / nə üçün', 'warum'],
