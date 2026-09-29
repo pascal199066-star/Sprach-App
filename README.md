@@ -109,6 +109,10 @@ node tools/collect-audio.mjs     # sammelt alle Texte aus data/
 python3 tools/make_audio.py      # erzeugt fehlende Aufnahmen + audio/manifest.json
 ```
 
+Das übernimmt auch der GitHub-Workflow **„Aufnahmen erzeugen“** (`.github/workflows/audio.yml`):
+Er läuft automatisch, sobald sich etwas in `data/` ändert, und checkt die neuen
+Aufnahmen selbst ein. Von Hand starten: **Actions → Aufnahmen erzeugen → Run workflow**.
+
 Der Dateiname ist ein Hash des Textes. Nach neuen oder geänderten Wörtern einfach
 beide Befehle erneut ausführen, vorhandene Aufnahmen werden übersprungen.
 

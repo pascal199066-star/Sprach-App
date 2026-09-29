@@ -1,0 +1,59 @@
+# Erzeugt die aserbaidschanischen Aufnahmen (audio/) mit den neuronalen
+# az-AZ-Stimmen und checkt sie in denselben Branch ein.
+# Läuft automatisch, sobald sich Wörter, Sätze oder die Werkzeuge ändern –
+# oder von Hand über „Actions → Aufnahmen erzeugen → Run workflow“.
+name: Aufnahmen erzeugen
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'data/**'
+      - 'tools/**'
+      - 'js/audio-key.js'
+      - '.github/workflows/audio.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: audio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: edge-tts installieren
+        run: pip install edge-tts
+
+      - name: Texte sammeln
+        run: node tools/collect-audio.mjs
+
+      - name: Aufnahmen erzeugen
+        run: python tools/make_audio.py
+
+      - name: Aufnahmen einchecken
+        if: success() || failure()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio
+          if git diff --cached --quiet; then
+            echo "Keine neuen Aufnahmen."
+            exit 0
+          fi
+          git commit -m "Aufnahmen aktualisiert ($(jq '.files | length' audio/manifest.json) Dateien)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
