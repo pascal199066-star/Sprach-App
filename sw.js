@@ -79,6 +79,17 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  // Liste der Aufnahmen: erst Netz, damit neue Aufnahmen sofort ankommen
+  if (url.pathname.endsWith('/audio/manifest.json')) {
+    e.respondWith(
+      fetch(req).then(res => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
+        return res;
+      }).catch(() => caches.match(req, { ignoreSearch: true }))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(req, { ignoreSearch: true }).then(hit => {
       const net = fetch(req).then(res => {

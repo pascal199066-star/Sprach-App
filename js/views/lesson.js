@@ -421,8 +421,9 @@ function wireType(root) {
   const input = root.querySelector('#type-in');
   input.addEventListener('input', () => { S.typed = input.value; });
   root.querySelectorAll('[data-key]').forEach(b => {
-    // pointerdown statt click: sonst verliert das Eingabefeld kurz den Fokus
-    b.addEventListener('pointerdown', e => {
+    // Am Rechner verhindert das, dass das Eingabefeld beim Tippen den Fokus verliert
+    b.addEventListener('mousedown', e => e.preventDefault());
+    b.addEventListener('click', e => {
       e.preventDefault();
       const start = input.selectionStart ?? input.value.length;
       input.value = input.value.slice(0, start) + b.dataset.key + input.value.slice(input.selectionEnd ?? start);
