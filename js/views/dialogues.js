@@ -1,5 +1,5 @@
 /** Dialoge zum Mitlesen und Anhören – mit Hörverstehen-Modus. */
-import { DIALOGUES, DIALOG_BY_ID } from '../../data/dialogues.js';
+import { DIALOGUES, DIALOG_BY_ID } from '../../data/active.js';
 import { esc } from '../ui.js';
 import { speakBtn, backBar, icon, callout } from '../components.js';
 import { speech } from '../speech.js';
@@ -20,10 +20,10 @@ export function render(params) {
       </div>
       <div class="card" id="dlg">
         ${d.lines.map((l, n) => `<div class="dl ${l.who === 'Du' ? 'me' : ''} ${hideDe ? 'hide-de' : ''}" data-line="${n}">
-          ${speakBtn(l.az, { voice: voiceOf(d, l) })}
+          ${speakBtn(l.t, { voice: voiceOf(d, l) })}
           <div class="bubble">
             <div class="who">${esc(l.who)}</div>
-            <div class="az">${esc(l.az)}</div>
+            <div class="az">${esc(l.t)}</div>
             <div class="de">${esc(l.de)}</div>
           </div>
         </div>`).join('')}
@@ -76,7 +76,7 @@ export function mount(params) {
         el.classList.toggle('dim', el.dataset.line != n));
       document.querySelector(`[data-line="${n}"]`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       const line = d.lines[n];
-      speech.say(line.az, { rate: store.settings.rate, voice: voiceOf(d, line), onend: () => { n++; setTimeout(step, 550); } });
+      speech.say(line.t, { rate: store.settings.rate, voice: voiceOf(d, line), onend: () => { n++; setTimeout(step, 550); } });
     };
     step();
   });

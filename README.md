@@ -1,6 +1,12 @@
-# Azərbaycanca — Aserbaidschanisch lernen
+# Sprach-App — Aserbaidschanisch & Business English
 
-Eine Lern-App für die Grundkenntnisse des Aserbaidschanischen, gebaut für das iPhone.
+Eine Lern-App mit zwei umschaltbaren Kursen, gebaut für das iPhone:
+
+- **Azərbaycanca** – Aserbaidschanisch von Grund auf
+- **Business English** – für Fortgeschrittene (B2 → C1), mit Fokus auf flüssiges Sprechen
+
+Umschalten oben auf der Startseite oder unter **Mehr → Einstellungen → Sprache**.
+Jeder Kurs hat seinen eigenen Lernstand; Streak und Tagesziel zählen gemeinsam.
 Sie läuft als installierbare Web-App (PWA): Icon auf dem Home-Bildschirm, Vollbild,
 offline nutzbar, kein App Store, kein Konto, keine Server.
 
@@ -59,7 +65,19 @@ anpassen und alle Aufnahmen für den Offline-Betrieb speichern.
 > **Später:** Wird der Branch irgendwann nach `main` zusammengeführt, unter
 > **Pages → Branch** einfach auf `main` umstellen. Die Adresse bleibt gleich.
 
-## Was die App kann
+## Business English (B2 → C1)
+
+| Bereich | Inhalt |
+|---|---|
+| **Kurs** | 6 Einheiten, 48 Lektionen: Meetings & Calls, Diplomatie, E-Mails, Präsentieren, Verhandeln, Networking |
+| **Wortschatz** | 170 Business-Ausdrücke in 12 Themen – jeder mit Beispielsatz, Stolperfallen erklärt |
+| **Grammatik & Stil** | 7 Kapitel zu typischen Fehlern Deutschsprachiger, diplomatischem Ton, E-Mail-Register, Signposting, Konditionalsätzen, falschen Freunden |
+| **Dialoge** | 6 Business-Situationen mit britischer und amerikanischer Stimme |
+| **Sprechen** | *Satz-Sprint*: deutscher Satz → in wenigen Sekunden laut auf Englisch. *Freies Sprechen*: 12 Situationen, eine Minute reden, aufnehmen, mit Musterantwort vergleichen |
+
+Zusätzliche Übungsform: **Lückensätze** – der passende Ausdruck muss in einen echten Business-Satz.
+
+## Aserbaidschanisch – was die App kann
 
 | Bereich | Inhalt |
 |---|---|
@@ -100,6 +118,8 @@ iOS bringt keine aserbaidschanische Stimme mit, und die türkische Stimme klingt
 hörbar türkisch: Sie kennt kein `ə`, kein `x`, verschluckt das `ğ` und betont anders.
 Deshalb liefert die App **fertige Aufnahmen** mit, erzeugt mit den neuronalen
 aserbaidschanischen Stimmen von Microsoft (`az-AZ-BanuNeural`, `az-AZ-BabekNeural`).
+Für Business English gibt es genauso Aufnahmen: britisch (`en-GB-SoniaNeural`) und
+amerikanisch (`en-US-AndrewNeural`).
 Die Aufnahmen liegen als MP3 in `audio/`, funktionieren offline und lassen sich
 langsamer abspielen.
 
@@ -132,7 +152,9 @@ sw.js                   Service Worker – macht alles offline verfügbar
 css/app.css             Design, helles und dunkles Erscheinungsbild
 js/
   app.js                Einstieg: Router, Tableiste, globale Audio-Knöpfe
+  lang.js               welche Sprache gerade läuft, Umschalten
   speech.js             Aufnahmen abspielen, sonst Systemstimme
+  recorder.js           eigene Aufnahme im Sprechtraining
   audio-key.js          Dateinamen der Aufnahmen (von App und Werkzeug geteilt)
   store.js              Fortschritt & Einstellungen (localStorage)
   srs.js                Verteiltes Wiederholen (SM-2, vereinfacht)
@@ -140,12 +162,14 @@ js/
   components.js         Symbole und wiederverwendbare Bausteine
   views/                Die einzelnen Ansichten
 data/
+  active.js             das aktive Sprachpaket – alle Ansichten lesen von hier
+  en/                   Business English: vocab, course, grammar, dialogues, speaking
   alphabet.js           32 Buchstaben mit Hörbeispielen
   vocab.js              198 Wörter und Wendungen mit Bausteinen
   grammar.js            11 Grammatikkapitel
   course.js             Kursaufbau: Einheiten und Lektionen
   dialogues.js          6 Dialoge
-audio/                  Aufnahmen (f = Banu, m = Babək) + manifest.json
+audio/                  Aufnahmen (f/m = Aserbaidschanisch, en-f/en-m = Englisch) + manifest.json
 tools/                  Werkzeuge zum Erzeugen der Aufnahmen
 ```
 
@@ -153,8 +177,9 @@ Kein Build-Schritt, keine Abhängigkeiten — reines ES-Modul-JavaScript.
 
 ### Inhalte erweitern
 
-Neues Wort in `data/vocab.js` eintragen (die `id` nie nachträglich ändern, daran hängt
-der Lernfortschritt) und die `id` in `data/course.js` einer Lektion zuordnen.
+Neues Wort in `data/vocab.js` (Englisch: `data/en/vocab.js`) eintragen – die `id` nie
+nachträglich ändern, daran hängt der Lernfortschritt – und die `id` in `data/course.js`
+(bzw. `data/en/course.js`) einer Lektion zuordnen.
 Die Übungen entstehen daraus von selbst. Danach die Aufnahmen neu erzeugen (siehe oben).
 
 ### Lokal ausprobieren

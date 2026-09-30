@@ -1,9 +1,9 @@
 /** Sprachführer: alle Wörter und Wendungen, durchsuchbar. */
-import { CATEGORIES, VOCAB } from '../../data/vocab.js';
+import { CATEGORIES, VOCAB } from '../../data/active.js';
 import { strength } from '../srs.js';
 import { store } from '../store.js';
 import { esc, md, normalize } from '../ui.js';
-import { speakBtn, pageHead, icon, phon, breakdown } from '../components.js';
+import { speakBtn, pageHead, icon, phon, breakdown, exampleLine } from '../components.js';
 
 let filter = { cat: 'all', q: '' };
 let open = null;    // aufgeklappter Eintrag
@@ -12,7 +12,7 @@ export function render() {
   return `<div class="view">
     ${pageHead('Wörter & Sätze', `${VOCAB.length} Einträge – alle zum Anhören. Tippe einen Eintrag für Details.`)}
     <div class="search-box">${icon('search')}
-      <input class="search" id="ph-search" type="search" placeholder="Suchen, z. B. „danke“ oder „su“"
+      <input class="search" id="ph-search" type="search" placeholder="Suchen – Deutsch oder Zielsprache"
              autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc(filter.q)}">
     </div>
     <div class="chips" id="ph-chips">
@@ -48,7 +48,7 @@ function list() {
   const q = normalize(filter.q);
   const items = VOCAB.filter(v =>
     (filter.cat === 'all' || v.cat === filter.cat) &&
-    (!q || normalize(v.az).includes(q) || normalize(v.de).includes(q)));
+    (!q || normalize(v.t).includes(q) || normalize(v.de).includes(q)));
 
   const el = document.getElementById('ph-list');
   if (!items.length) {
@@ -73,13 +73,13 @@ function row(v) {
     : st > 0 ? '<span class="dot-strength s1" title="in Arbeit"></span>' : '';
   const isOpen = open === v.id;
   return `<div class="vocab-item" data-id="${v.id}" style="cursor:pointer;align-items:flex-start">
-    ${speakBtn(v.az)}
+    ${speakBtn(v.t)}
     <div class="grow">
-      <div class="az">${esc(v.az)}${dot}</div>
+      <div class="az">${esc(v.t)}${dot}</div>
       <div class="de">${esc(v.de)}</div>
       ${store.settings.showPhonetic && v.ph ? phon(v.ph) : ''}
-      ${isOpen ? `${v.note ? `<div class="note-s">${md(v.note)}</div>` : ''}${breakdown(v.br)}` : ''}
+      ${isOpen ? `${v.note ? `<div class="note-s">${md(v.note)}</div>` : ''}${breakdown(v.br)}${exampleLine(v)}` : ''}
     </div>
-    ${isOpen ? speakBtn(v.az, { slow: true }) : (v.br || v.note ? `<span class="muted" style="margin-top:12px">${icon('chevR')}</span>` : '')}
+    ${isOpen ? speakBtn(v.t, { slow: true }) : (v.br || v.note || v.ex ? `<span class="muted" style="margin-top:12px">${icon('chevR')}</span>` : '')}
   </div>`;
 }

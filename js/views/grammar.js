@@ -1,5 +1,5 @@
 /** Grammatik: Übersicht und einzelne Kapitel. */
-import { GRAMMAR, GRAMMAR_BY_ID } from '../../data/grammar.js';
+import { GRAMMAR, GRAMMAR_BY_ID } from '../../data/active.js';
 import { esc, md } from '../ui.js';
 import { speakBtn, backBar, icon } from '../components.js';
 
@@ -19,9 +19,9 @@ export function grammarBlocks(g) {
       case 'ex':
         return `<div class="gr-block">${b.items.map(it => `
           <div class="vocab-item">
-            ${speakBtn(it.az)}
+            ${speakBtn(it.t)}
             <div class="grow">
-              <div class="az">${esc(it.az)}</div>
+              <div class="az">${esc(it.t)}</div>
               <div class="de">${esc(it.de)}</div>
             </div>
           </div>`).join('')}</div>`;

@@ -50,6 +50,9 @@ export const ICONS = {
   bed:     '<path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11.5" r="2"/>',
   pin:     '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.5"/>',
   car:     '<path d="M6.5 17H5a1 1 0 0 1-1-1v-3.5L6.2 7h11.6l2.2 5.5V16a1 1 0 0 1-1 1h-1.5M9.8 17h4.4M4 12.5h16"/><circle cx="8" cy="17" r="1.8"/><circle cx="16" cy="17" r="1.8"/>',
+  mail:    '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  scale:   '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0zM19 7l-2.5 6a2.5 2.5 0 0 0 5 0z"/>',
+  timer:   '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>',
   grammar: '<path d="M4 6h7M4 12h10M4 18h6"/><path d="m15 18 3-8 3 8M16.2 15.5h3.6"/>'
 };
 
@@ -81,9 +84,9 @@ export function phon(ph) {
 /** Wort + Übersetzung + Lautschrift + Audio. */
 export function vocabRow(v, { phonetic = true, extra = '' } = {}) {
   return `<div class="vocab-item">
-    ${speakBtn(v.az)}
+    ${speakBtn(v.t)}
     <div class="grow">
-      <div class="az">${esc(v.az)}</div>
+      <div class="az">${esc(v.t)}</div>
       <div class="de">${esc(v.de)}</div>
       ${phonetic && v.ph ? phon(v.ph) : ''}
       ${extra}
@@ -174,6 +177,20 @@ export function emptyState(iconName, title, text) {
     <div class="empty-ic">${icon(iconName)}</div>
     <h3>${esc(title)}</h3>
     <p class="muted">${esc(text)}</p>
+  </div>`;
+}
+
+/** Beispielsatz mit Audio. */
+export function exampleLine(v) {
+  if (!v?.ex) return '';
+  return `<div class="example-line">${speakBtn(v.ex)}<div class="grow"><div class="lbl-s">Beispiel</div><div>${esc(v.ex)}</div></div></div>`;
+}
+
+/** Umschalter zwischen den Sprachkursen. */
+export function langSwitch(active) {
+  const opts = [['az', 'Azərbaycanca'], ['en', 'Business English']];
+  return `<div class="seg lang-switch" role="group" aria-label="Sprache wählen">
+    ${opts.map(([id, label]) => `<button data-lang="${id}" class="${id === active ? 'on' : ''}" aria-pressed="${id === active}">${label}</button>`).join('')}
   </div>`;
 }
 

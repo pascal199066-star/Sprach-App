@@ -2,9 +2,10 @@
 import { store } from '../store.js';
 import { speech } from '../speech.js';
 import { VOICES } from '../audio-key.js';
-import { DEMO_SENTENCE } from '../../data/extra-audio.js';
+import { PACK } from '../../data/active.js';
+import { DEMO_SENTENCE } from '../../data/active.js';
 import { esc, toast } from '../ui.js';
-import { backBar, icon } from '../components.js';
+import { backBar, icon, langSwitch } from '../components.js';
 import { QUALITY } from './more.js';
 
 export function render() {
@@ -17,7 +18,13 @@ export function render() {
   return `<div class="view">
     ${backBar('Einstellungen', '#/more')}
 
-    <h2 style="margin-top:6px">Aussprache</h2>
+    <h2 style="margin-top:6px">Sprache</h2>
+    <div class="card">
+      ${langSwitch(PACK.id)}
+      <p class="muted" style="font-size:13px;margin:10px 0 0">Jede Sprache hat ihren eigenen Lernstand. Streak und Tagesziel zählen gemeinsam.</p>
+    </div>
+
+    <h2>Aussprache</h2>
     <div class="card">
       <div class="status" style="margin-bottom:12px">
         <span class="dot ${level}"></span>
@@ -27,7 +34,7 @@ export function render() {
       ${hasRec ? `
       <div class="list-row" style="padding-top:4px"><div class="grow"><b>Stimme</b><div class="muted">Für Wörter und Übungen</div></div></div>
       <div class="seg" id="rec-voice">
-        ${Object.entries(VOICES).map(([k, v]) => `<button data-v="${k}" class="${(s.voice || 'f') === k ? 'on' : ''}">${esc(v.label)} · ${esc(v.desc)}</button>`).join('')}
+        ${Object.entries(VOICES[PACK.id]).map(([k, v]) => `<button data-v="${k}" class="${(s.voice || 'f') === k ? 'on' : ''}">${esc(v.label)} · ${esc(v.desc)}</button>`).join('')}
       </div>` : ''}
 
       <div class="list-row" style="margin-top:6px">
@@ -60,7 +67,7 @@ export function render() {
       </div>
       <input type="range" id="goal" min="10" max="100" step="10" value="${s.dailyGoal}" aria-label="Tagesziel">
 
-      <div class="list-row">
+      <div class="list-row${PACK.id === 'az' ? '' : ' hide'}">
         <div class="grow"><b>Lautschrift anzeigen</b><div class="muted">Deutsche Aussprachehilfe unter jedem Wort</div></div>
         <button class="switch ${s.showPhonetic ? 'on' : ''}" id="sw-ph" role="switch" aria-checked="${s.showPhonetic}" aria-label="Lautschrift anzeigen"><i></i></button>
       </div>
@@ -83,7 +90,7 @@ export function render() {
 
     <h2>Daten</h2>
     <div class="card">
-      <button class="btn danger block small" id="reset">Fortschritt zurücksetzen</button>
+      <button class="btn danger block small" id="reset">Fortschritt in ${PACK.name} zurücksetzen</button>
       <p class="muted" style="font-size:12.5px;margin:10px 0 0">
         Lernstand, Wiederholungen und Einstellungen werden nur lokal in Safari gespeichert.
         Löschst du die Website-Daten, ist auch der Lernstand weg.
@@ -161,7 +168,7 @@ export function mount() {
   });
 
   document.getElementById('reset').addEventListener('click', () => {
-    if (!confirm('Wirklich den gesamten Lernfortschritt löschen? Das lässt sich nicht rückgängig machen.')) return;
+    if (!confirm(`Wirklich den Lernfortschritt in ${PACK.name} löschen? Das lässt sich nicht rückgängig machen.`)) return;
     store.reset();
     toast('Fortschritt zurückgesetzt');
     location.hash = '#/home';

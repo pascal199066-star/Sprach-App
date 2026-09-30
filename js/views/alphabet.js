@@ -1,6 +1,6 @@
 /** Alphabet-Übersicht und Buchstaben-Detail. */
-import { ALPHABET, TRICKY } from '../../data/alphabet.js';
-import { VOCAB } from '../../data/vocab.js';
+import { ALPHABET, TRICKY } from '../../data/active.js';
+import { VOCAB } from '../../data/active.js';
 import { esc } from '../ui.js';
 import { speakBtn, backBar, pageHead, icon, callout } from '../components.js';
 
@@ -27,10 +27,10 @@ function detail(low) {
   const prev = ALPHABET[i - 1], next = ALPHABET[i + 1];
 
   // Wörter aus dem Kurs, die diesen Buchstaben enthalten – kurze zuerst
-  const words = VOCAB.filter(v => !v.az.includes(' ') && v.az.toLowerCase().includes(l.low) && v.az !== l.ex)
-    .sort((a, b) => a.az.length - b.az.length).slice(0, 5);
-  const examples = [{ az: l.ex, de: l.exDe }, ...(l.more || []), ...words.map(v => ({ az: v.az, de: v.de }))]
-    .filter((x, n, arr) => arr.findIndex(y => y.az === x.az) === n).slice(0, 7);
+  const words = VOCAB.filter(v => !v.t.includes(' ') && v.t.toLowerCase().includes(l.low) && v.t !== l.ex)
+    .sort((a, b) => a.t.length - b.t.length).slice(0, 5);
+  const examples = [{ t: l.ex, de: l.exDe }, ...(l.more || []), ...words.map(v => ({ t: v.t, de: v.de }))]
+    .filter((x, n, arr) => arr.findIndex(y => y.t === x.t) === n).slice(0, 7);
 
   return `<div class="view">
     ${backBar(`Buchstabe ${l.up}`, '#/alphabet', `${i + 1} von ${ALPHABET.length}`)}
@@ -43,9 +43,9 @@ function detail(low) {
 
     <div class="sec-h">${icon('speaker')}<h2>Zum Anhören</h2></div>
     <div class="card">
-      ${examples.map(x => `<div class="vocab-item">${speakBtn(x.az)}
-        <div class="grow"><div class="az">${highlight(x.az, l.low)}</div><div class="de">${esc(x.de)}</div></div>
-        ${speakBtn(x.az, { slow: true })}
+      ${examples.map(x => `<div class="vocab-item">${speakBtn(x.t)}
+        <div class="grow"><div class="az">${highlight(x.t, l.low)}</div><div class="de">${esc(x.de)}</div></div>
+        ${speakBtn(x.t, { slow: true })}
       </div>`).join('')}
     </div>
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 Erzeugt die Aufnahmen für alle Texte aus tools/audio-jobs.json mit den
-neuronalen aserbaidschanischen Stimmen von Microsoft (az-AZ-BanuNeural,
-az-AZ-BabekNeural) über das Paket edge-tts.
+neuronalen Stimmen von Microsoft (Aserbaidschanisch: az-AZ-BanuNeural,
+az-AZ-BabekNeural; Englisch: en-GB-SoniaNeural, en-US-AndrewNeural) über
+das Paket edge-tts. Welche Stimme wofür, steht in js/audio-key.js.
 
     pip install edge-tts
     node tools/collect-audio.mjs

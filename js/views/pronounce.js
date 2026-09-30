@@ -2,8 +2,8 @@
  * Aussprache-Trainer: Wort anhören, selbst nachsprechen, direkt vergleichen.
  * Die Aufnahme bleibt im Arbeitsspeicher und verlässt das Gerät nicht.
  */
-import { VOCAB, VOCAB_BY_ID } from '../../data/vocab.js';
-import { TRICKY } from '../../data/alphabet.js';
+import { VOCAB, VOCAB_BY_ID } from '../../data/active.js';
+import { TRICKY, PACK } from '../../data/active.js';
 import { store } from '../store.js';
 import { esc, shuffle, toast } from '../ui.js';
 import { speakBtn, backBar, icon, phon, soundTips } from '../components.js';
@@ -15,7 +15,7 @@ let idx = 0;
 
 /** Wörter, die genau die schwierigen Laute enthalten – nach vorn sortiert. */
 function buildQueue() {
-  const hard = VOCAB.filter(v => TRICKY.some(t => v.az.toLowerCase().includes(t)));
+  const hard = VOCAB.filter(v => TRICKY.some(t => v.t.toLowerCase().includes(t)));
   const rest = VOCAB.filter(v => !hard.includes(v));
   return [...shuffle(hard), ...shuffle(rest)].map(v => v.id);
 }
@@ -29,11 +29,11 @@ export function render() {
     ${backBar('Aussprache-Trainer', '#/more', `Anhören, nachsprechen, vergleichen · ${idx + 1} von ${queue.length}`)}
 
     <div class="card stage">
-      <div class="prompt-big az">${esc(v.az)}</div>
+      <div class="prompt-big az">${esc(v.t)}</div>
       ${phon(v.ph)}
       <div class="de-big" style="font-size:16px;margin-top:6px">${esc(v.de)}</div>
-      <div class="speakers">${speakBtn(v.az, { size: 'lg' })}${speakBtn(v.az, { slow: true })}</div>
-      ${soundTips(v.az)}
+      <div class="speakers">${speakBtn(v.t, { size: 'lg' })}${speakBtn(v.t, { slow: true })}</div>
+      ${PACK.id === 'az' ? soundTips(v.t) : ''}
     </div>
 
     ${canRecord ? `
@@ -42,7 +42,7 @@ export function render() {
       <div class="muted" style="font-size:14px;margin-top:10px" id="rec-hint">Zum Aufnehmen tippen – dann das Wort nachsprechen</div>
       <div id="playback" class="hide" style="margin-top:14px">
         <div class="row" style="gap:8px">
-          <button class="btn soft grow small" data-say="${esc(v.az)}">${icon('speaker')} Original</button>
+          <button class="btn soft grow small" data-say="${esc(v.t)}">${icon('speaker')} Original</button>
           <button class="btn ghost grow small" id="replay">${icon('play')} Meine Aufnahme</button>
         </div>
         <audio id="my-audio" playsinline style="display:none"></audio>

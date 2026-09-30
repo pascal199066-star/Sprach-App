@@ -67,6 +67,13 @@
   color-scheme: dark;
 }
 
+/* Business English: eigene Leitfarbe (Indigo), damit man sofort sieht, welcher Kurs läuft */
+:root[data-lang="en"] { --brand:#3a52c4; --brand-2:#2f43a3; --brand-soft:#e7ebfb; --brand-ink:#1a2250; }
+@media (prefers-color-scheme: dark) {
+  :root[data-lang="en"]:not([data-theme="light"]) { --brand:#8b9cff; --brand-2:#a5b2ff; --brand-soft:#1d2448; --brand-ink:#1a2146; --on-brand:#0b1030; }
+}
+:root[data-lang="en"][data-theme="dark"] { --brand:#8b9cff; --brand-2:#a5b2ff; --brand-soft:#1d2448; --brand-ink:#1a2146; --on-brand:#0b1030; }
+
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 html, body {
@@ -486,6 +493,24 @@ a.card, button.card { transition: transform .1s ease; width: 100%; text-align: l
 .verdict.close .btn.primary { background: var(--close); color: #fff; box-shadow: none; }
 .verdict.no .btn.primary { background: var(--bad); color: #fff; box-shadow: none; }
 
+/* Beispielsatz & Lückensatz */
+.prompt-big.long { font-size: 26px; letter-spacing: -.4px; }
+.example-line { display: flex; gap: 12px; align-items: center; text-align: left; margin-top: 16px; padding: 12px; border-radius: 14px; background: var(--surface-2); font-size: 15.5px; line-height: 1.4; }
+.example-line .speak { width: 38px; height: 38px; background: var(--surface); }
+.example-line .speak .i { width: 18px; height: 18px; }
+.lbl-s { font-size: 11px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1px; }
+.gap-sentence { font-size: 21px; font-weight: 620; line-height: 1.5; letter-spacing: -.2px; }
+.gap { display: inline-block; min-width: 96px; border-bottom: 2.5px solid var(--brand); margin: 0 3px; padding: 0 4px; color: var(--brand); text-align: center; }
+s { color: var(--bad); text-decoration-thickness: 1.5px; }
+
+/* Abhakliste (Freies Sprechen) */
+.check-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15.5px; font-weight: 560; }
+.check-row:last-of-type { border-bottom: 0; }
+.check-row .box { width: 26px; height: 26px; border-radius: 8px; flex: 0 0 auto; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--line); color: transparent; transition: background .15s ease; }
+.check-row .box .i { width: 16px; height: 16px; stroke-width: 2.8; }
+.check-row.on .box { background: var(--good); color: #fff; box-shadow: none; }
+.check-row.on .grow { color: var(--text-dim); }
+
 /* Zusammenfassung */
 .done-hero { text-align: center; padding: 26px 8px 8px; }
 .done-hero .medal { width: 96px; height: 96px; border-radius: 30px; margin: 0 auto 16px; display: grid; place-items: center; background: var(--gold-soft); color: var(--gold); }
@@ -585,6 +610,11 @@ input.search.plain { padding-left: 14px; }
 .seg { display: flex; background: var(--surface-2); border-radius: 12px; padding: 3px; gap: 3px; }
 .seg button { flex: 1; min-height: 36px; border-radius: 9px; font-size: 14.5px; font-weight: 620; color: var(--text-dim); }
 .seg button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.lang-switch { margin: -4px 0 14px; }
+.lang-switch button { min-height: 40px; font-weight: 700; }
+.lang-switch button.on { color: var(--brand); }
+.card .lang-switch { margin: 0; }
+.brandmark.wide { font-size: 18px; letter-spacing: -.5px; }
 
 input[type="range"] { width: 100%; accent-color: var(--brand); margin: 6px 0; }
 .switch { width: 51px; height: 31px; border-radius: 99px; background: var(--surface-3); position: relative; transition: background .2s; flex: 0 0 auto; }

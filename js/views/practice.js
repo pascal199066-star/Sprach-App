@@ -3,10 +3,10 @@
  * Zeigt Deutsch, du denkst nach (oder sprichst laut), deckst auf und bewertest dich selbst.
  */
 import { due, grade, dueCount, cardOf, AGAIN } from '../srs.js';
-import { VOCAB, VOCAB_BY_ID } from '../../data/vocab.js';
+import { VOCAB, VOCAB_BY_ID, PACK } from '../../data/active.js';
 import { store } from '../store.js';
 import { esc, md, shuffle, buzz } from '../ui.js';
-import { speakBtn, emptyState, pageHead, icon, phon, breakdown, soundTips, progressBar } from '../components.js';
+import { speakBtn, emptyState, pageHead, icon, phon, breakdown, soundTips, progressBar, exampleLine } from '../components.js';
 import { speech } from '../speech.js';
 
 let P = null;
@@ -71,12 +71,13 @@ function cardHtml() {
         <div class="prompt-mid">${esc(v.de)}</div>
         ${P.shown ? `
           <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--line)">
-            <div class="prompt-big az">${esc(v.az)}</div>
+            <div class="prompt-big az">${esc(v.t)}</div>
             ${store.settings.showPhonetic ? phon(v.ph) : ''}
-            <div class="speakers">${speakBtn(v.az, { size: 'lg' })}${speakBtn(v.az, { slow: true })}</div>
-            ${soundTips(v.az)}
+            <div class="speakers">${speakBtn(v.t, { size: 'lg' })}${speakBtn(v.t, { slow: true })}</div>
+            ${PACK.id === 'az' ? soundTips(v.t) : ''}
             ${breakdown(v.br)}
-          </div>` : `<p class="muted" style="margin:16px 0 0;font-size:14.5px">Wie heißt das auf Aserbaidschanisch?</p>`}
+            ${exampleLine(v)}
+          </div>` : `<p class="muted" style="margin:16px 0 0;font-size:14.5px">Wie heißt das auf ${PACK.name}? Sag es laut.</p>`}
       </div>
       ${P.shown && v.note ? `<div class="callout tip">${icon('bulb')}<div class="grow">${md(v.note)}</div></div>` : ''}
     </div>
@@ -133,7 +134,7 @@ function wire() {
     P.shown = true;
     const v = VOCAB_BY_ID[P.queue[P.i]];
     repaint();
-    if (store.settings.autoPlay) setTimeout(() => speech.say(v.az, { rate: store.settings.rate }), 160);
+    if (store.settings.autoPlay) setTimeout(() => speech.say(v.t, { rate: store.settings.rate }), 160);
   });
   root.querySelectorAll('[data-grade]').forEach(b => {
     b.addEventListener('click', () => {

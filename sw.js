@@ -4,7 +4,7 @@
  * damit die App auch im Flugzeug oder ohne Empfang startet.
  * Aufnahmen landen in einem eigenen Cache, der Updates überlebt.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `azaz-${VERSION}`;
 const AUDIO_CACHE = 'azaz-audio';
 
@@ -15,6 +15,8 @@ const ASSETS = [
   './css/app.css',
   './js/app.js',
   './js/audio-key.js',
+  './js/lang.js',
+  './js/recorder.js',
   './js/router.js',
   './js/store.js',
   './js/srs.js',
@@ -34,12 +36,19 @@ const ASSETS = [
   './js/views/stats.js',
   './js/views/pronounce.js',
   './js/views/help.js',
+  './js/views/speak.js',
   './data/alphabet.js',
   './data/vocab.js',
   './data/grammar.js',
   './data/course.js',
   './data/dialogues.js',
   './data/extra-audio.js',
+  './data/active.js',
+  './data/en/vocab.js',
+  './data/en/course.js',
+  './data/en/grammar.js',
+  './data/en/dialogues.js',
+  './data/en/speaking.js',
   './assets/icon-192.png',
   './assets/icon-512.png',
   './assets/apple-touch-icon.png',

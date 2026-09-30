@@ -8,11 +8,12 @@ export function esc(s) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-/** Minimales Markdown: **fett**, `code`, Zeilenumbrüche. */
+/** Minimales Markdown: **fett**, `code`, ~~durchgestrichen~~, Zeilenumbrüche. */
 export function md(s) {
   return esc(s)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/~~(.+?)~~/g, '<s>$1</s>')
     .replace(/\n/g, '<br>');
 }
 

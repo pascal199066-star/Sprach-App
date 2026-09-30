@@ -1,16 +1,17 @@
 /** „Mehr“: Einstiegspunkte zu allem, was nicht in die Tabs passt. */
-import { GRAMMAR } from '../../data/grammar.js';
-import { DIALOGUES } from '../../data/dialogues.js';
+import { GRAMMAR, DIALOGUES, SPEAKING, PACK } from '../../data/active.js';
 import { speech } from '../speech.js';
 import { pageHead, icon } from '../components.js';
 
+const AZ = PACK.id === 'az';
 const GROUPS = [
   [
-    { href: '#/grammar',   icon: 'grammar', cls: '',     title: 'Grammatik',          sub: () => `${GRAMMAR.length} kurze Kapitel – das Grundgerüst` },
-    { href: '#/dialogues', icon: 'users',   cls: 'nar',  title: 'Dialoge',            sub: () => `${DIALOGUES.length} Alltagsszenen zum Anhören` },
+    { href: '#/grammar',   icon: 'grammar', cls: '',     title: AZ ? 'Grammatik' : 'Grammatik & Stil', sub: () => `${GRAMMAR.length} kurze Kapitel – ${AZ ? 'das Grundgerüst' : 'typische Fehler, Ton, Struktur'}` },
+    { href: '#/dialogues', icon: 'users',   cls: 'nar',  title: AZ ? 'Dialoge' : 'Business-Dialoge', sub: () => `${DIALOGUES.length} ${AZ ? 'Alltagsszenen' : 'Situationen aus dem Arbeitsalltag'} zum Anhören` },
+    AZ ? { href: '#/speak', icon: 'timer', cls: 'good', title: 'Satz-Sprint', sub: () => 'Schnell antworten, laut sprechen' } : null,
     { href: '#/pronounce', icon: 'mic',     cls: 'gold', title: 'Aussprache-Trainer', sub: () => 'Nachsprechen und mit dem Original vergleichen' },
-    { href: '#/help',      icon: 'help',    cls: 'good', title: 'Aussprache-Hilfe',   sub: () => 'Lautschrift lesen, die schwierigen Laute, Betonung' }
-  ],
+    AZ ? { href: '#/help',  icon: 'help',    cls: 'good', title: 'Aussprache-Hilfe',   sub: () => 'Lautschrift lesen, die schwierigen Laute, Betonung' } : null
+  ].filter(Boolean),
   [
     { href: '#/stats',     icon: 'chart',   cls: 'ink',  title: 'Statistik',          sub: () => 'Streak, XP und Wortschatz' },
     { href: '#/settings',  icon: 'sliders', cls: 'ink',  title: 'Einstellungen',      sub: () => 'Stimme, Tempo, Tagesziel, Design' }
@@ -18,8 +19,12 @@ const GROUPS = [
 ];
 
 export const QUALITY = {
-  recorded: ['Echte aserbaidschanische Aufnahmen', 'Neuronale az-AZ-Stimmen, in der App gespeichert – funktioniert auch offline.', 'good'],
-  native:   ['Aserbaidschanische Systemstimme', 'Dein Gerät hat eine eigene aserbaidschanische Stimme.', 'good'],
+  recorded: AZ
+    ? ['Echte aserbaidschanische Aufnahmen', 'Neuronale az-AZ-Stimmen, in der App gespeichert – funktioniert auch offline.', 'good']
+    : ['Aufnahmen mit neuronalen Stimmen', 'Britisch und amerikanisch, in der App gespeichert – funktioniert auch offline.', 'good'],
+  native:   AZ
+    ? ['Aserbaidschanische Systemstimme', 'Dein Gerät hat eine eigene aserbaidschanische Stimme.', 'good']
+    : ['Englische Systemstimme', 'Die Stimme deines Geräts – bis die Aufnahmen geladen sind.', 'good'],
   turkish:  ['Notlösung: türkische Stimme', 'Klingt hörbar türkisch – ə, q und x werden nur angenähert. Verlass dich auf die Lautschrift.', 'ok'],
   fallback: ['Notlösung: fremde Stimme', 'Die Aussprache kann deutlich abweichen.', 'warn'],
   none:     ['Keine Stimme gefunden', 'Weder Aufnahmen noch eine passende Gerätestimme vorhanden.', 'warn']

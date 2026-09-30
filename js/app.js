@@ -1,5 +1,5 @@
 /**
- * Aserbaidschanisch lernen – App-Einstieg.
+ * Sprach-App (Aserbaidschanisch & Business English) – App-Einstieg.
  * Hält Router, Tableiste, globale Audio-Knöpfe und den Service Worker zusammen.
  */
 import { route, resolve } from './router.js';
@@ -9,6 +9,8 @@ import { dueCount } from './srs.js';
 import { icon } from './components.js';
 import { toast } from './ui.js';
 import { applyTheme } from './views/settings.js';
+import { LANG, PACK_META, switchLang } from './lang.js';
+import { recorder } from './recorder.js';
 
 import * as home      from './views/home.js';
 import * as lesson    from './views/lesson.js';
@@ -22,6 +24,7 @@ import * as settings  from './views/settings.js';
 import * as stats     from './views/stats.js';
 import * as pronounce from './views/pronounce.js';
 import * as help      from './views/help.js';
+import * as speak     from './views/speak.js';
 
 route('/home', home);
 route('/lesson/:id', lesson);
@@ -38,11 +41,16 @@ route('/settings', settings);
 route('/stats', stats);
 route('/pronounce', pronounce);
 route('/help', help);
+route('/speak', speak);
+route('/speak/:id', speak);
 
+// Der dritte Tab: Alphabet fürs Aserbaidschanische, Sprechtraining fürs Englische
 const TABS = [
   { id: 'home',     href: '#/home',     label: 'Lernen',   icon: 'learn' },
   { id: 'practice', href: '#/practice', label: 'Wiederholen', icon: 'repeat' },
-  { id: 'alphabet', href: '#/alphabet', label: 'Alphabet', icon: 'abc' },
+  LANG === 'az'
+    ? { id: 'alphabet', href: '#/alphabet', label: 'Alphabet', icon: 'abc' }
+    : { id: 'speak',    href: '#/speak',    label: 'Sprechen', icon: 'mic' },
   { id: 'phrases',  href: '#/phrases',  label: 'Wörter',   icon: 'chat' },
   { id: 'more',     href: '#/more',     label: 'Mehr',     icon: 'grid' }
 ];
@@ -51,7 +59,8 @@ const TAB_FOR = {
   home: 'home', lesson: 'home',
   practice: 'practice', alphabet: 'alphabet', phrases: 'phrases',
   more: 'more', grammar: 'more', dialogues: 'more',
-  settings: 'more', stats: 'more', pronounce: 'more', help: 'more'
+  settings: 'more', stats: 'more', pronounce: 'more', help: 'more',
+  speak: LANG === 'az' ? 'more' : 'speak'
 };
 
 const app = document.getElementById('app');
@@ -71,8 +80,11 @@ function render() {
   if (!match) { location.replace('#/home'); return; }
 
   const root = match.path.split('/').filter(Boolean)[0] || 'home';
+  // Das Alphabet gibt es nur im Aserbaidschanisch-Kurs
+  if (LANG !== 'az' && (root === 'alphabet' || root === 'help')) { location.replace('#/home'); return; }
   document.body.classList.toggle('immersive', root === 'lesson');
   speech.stop();
+  recorder.discard();
 
   app.innerHTML = match.view.render(match.params);
   match.view.mount?.(match.params);
@@ -103,6 +115,12 @@ document.addEventListener('click', e => {
   setTimeout(done, 8000);
 });
 
+// Sprache wechseln (Knöpfe mit data-lang auf Start- und Einstellungsseite)
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-lang]');
+  if (b) switchLang(b.dataset.lang);
+});
+
 // Tableiste
 tabbar.addEventListener('click', e => {
   const b = e.target.closest('[data-href]');
@@ -128,6 +146,8 @@ window.addEventListener('hashchange', render);
 /* ------------------------------------------------------------------- Start */
 
 applyTheme();
+document.title = `${PACK_META.title} – Sprach-App`;
+document.documentElement.dataset.lang = LANG;
 if (store.settings.voiceURI) speech.setVoice(store.settings.voiceURI);
 speech.setPreferred(store.settings.voice || 'f');
 if (!location.hash) location.replace('#/home');

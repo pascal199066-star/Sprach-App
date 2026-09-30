@@ -11,17 +11,18 @@
  *    Auswahl die Bedeutung der gewählten Antwort, dazu die Bausteine.
  */
 import { buildLesson } from '../lesson-engine.js';
-import { LESSON_BY_ID, LESSONS } from '../../data/course.js';
-import { LETTER_BY_LOW } from '../../data/alphabet.js';
+import { LESSON_BY_ID, LESSONS } from '../../data/active.js';
+import { LETTER_BY_LOW, PACK } from '../../data/active.js';
 import { store } from '../store.js';
 import { grade, introduce, GOOD, HARD, AGAIN } from '../srs.js';
 import { esc, md, compareTyped, buzz } from '../ui.js';
-import { speakBtn, progressBar, icon, breakdown, soundTips, phon, callout } from '../components.js';
+import { speakBtn, progressBar, icon, breakdown, soundTips, phon, callout, exampleLine } from '../components.js';
 import { speech } from '../speech.js';
 import { grammarBlocks } from './grammar.js';
 
 const AZ_KEYS = ['ə', 'ı', 'ö', 'ü', 'ç', 'ş', 'ğ', 'q', 'x'];
-const HINTABLE = ['choose', 'build', 'type', 'letter-pick', 'letter-word'];
+const HINTABLE = ['choose', 'gap', 'build', 'type', 'letter-pick', 'letter-word'];
+const IS_AZ = PACK.id === 'az';
 
 let S = null;   // Sitzungszustand
 
@@ -72,7 +73,7 @@ function cardHtml() {
   const body = {
     intro: introCard, choose: chooseCard, build: buildCard, type: typeCard,
     'letter-intro': letterIntroCard, 'letter-pick': letterPickCard,
-    'letter-word': letterWordCard, grammar: grammarCard, dialog: dialogCard
+    'letter-word': letterWordCard, grammar: grammarCard, dialog: dialogCard, gap: gapCard
   }[c.type](c);
   return topBar(c) + `<div class="grow">${body}</div>` + footerHtml(c);
 }
@@ -123,7 +124,7 @@ function verdictHtml(c) {
 }
 
 function pickPraise() {
-  const w = ['Richtig!', 'Əla! Sehr gut!', 'Genau!', 'Super!', 'Stimmt!'];
+  const w = ['Richtig!', IS_AZ ? 'Əla! Sehr gut!' : 'Excellent!', 'Genau!', 'Super!', 'Stimmt!'];
   return w[S.asked % w.length];
 }
 
@@ -131,15 +132,17 @@ function pickPraise() {
 function solutionAz(c) {
   if (c.type === 'letter-pick') return c.letter.ex;
   if (c.type === 'letter-word') return c.answer;
-  if (c.item?.az) return c.item.az;
+  if (c.type === 'gap') return c.item.ex;
+  if (c.item?.t) return c.item.t;
   return null;
 }
 
 function solutionText(c) {
   if (c.type === 'letter-pick') return `${c.letter.up} ${c.letter.low} – klingt wie „${c.letter.ph}“`;
   if (c.type === 'letter-word') return `${c.answer} – ${c.alts?.[c.answer] || ''}`;
-  if (c.type === 'choose' && c.item?.az) {
-    return c.optionLang === 'de' ? `${c.item.az} = ${c.answer}` : `${c.answer} = ${c.item.de}`;
+  if (c.type === 'gap') return c.item.ex;
+  if (c.type === 'choose' && c.item?.t) {
+    return c.optionLang === 'de' ? `${c.item.t} = ${c.answer}` : `${c.answer} = ${c.item.de}`;
   }
   return c.answer;
 }
@@ -147,7 +150,7 @@ function solutionText(c) {
 /** Warum war das falsch – und was lernt man daraus? */
 function explanation(c) {
   const out = [];
-  if (S.issues?.length) {
+  if (IS_AZ && S.issues?.length) {
     S.issues.slice(0, 3).forEach(({ exp, got }) => {
       const l = LETTER_BY_LOW[exp];
       out.push(`<p>Du hast <b>${esc(got)}</b> geschrieben – hier gehört <b>${esc(exp)}</b> hin${l ? ` (klingt wie „${esc(l.ph)}“)` : ''}.</p>`);
@@ -159,8 +162,8 @@ function explanation(c) {
     out.push('<p>Nur ein kleiner Tippfehler – schau dir die markierte Stelle an.</p>');
   }
   if (S.picked && S.picked !== c.answer && c.alts?.[S.picked]) {
-    const isAz = c.optionLang === 'az' || c.type === 'letter-word';
-    out.push(`<p>Deine Wahl <b>${esc(S.picked)}</b> ${isAz ? 'bedeutet' : 'heißt auf Aserbaidschanisch'} „${esc(c.alts[S.picked])}“.</p>`);
+    const isTarget = c.optionLang === 't' || c.type === 'letter-word' || c.type === 'gap';
+    out.push(`<p>Deine Wahl <b>${esc(S.picked)}</b> ${isTarget ? 'bedeutet' : `heißt auf ${PACK.name}`} „${esc(c.alts[S.picked])}“.</p>`);
   }
   if (c.type === 'letter-pick' && S.result !== 'ok') out.push(`<p>${md(c.letter.tip)}</p>`);
   return out.join('');
@@ -170,12 +173,13 @@ function introCard(c) {
   const v = c.item;
   return `<div class="q">${icon('sparkle')}Neu</div>
   <div class="card stage">
-    <div class="prompt-big az">${esc(v.az)}</div>
+    <div class="prompt-big az${v.t.length > 26 ? ' long' : ''}">${esc(v.t)}</div>
     ${store.settings.showPhonetic ? phon(v.ph) : ''}
-    <div class="speakers">${speakBtn(v.az, { size: 'lg' })}${speakBtn(v.az, { slow: true })}</div>
+    <div class="speakers">${speakBtn(v.t, { size: 'lg' })}${speakBtn(v.t, { slow: true })}</div>
     <div class="de-big">${esc(v.de)}</div>
-    ${soundTips(v.az)}
+    ${IS_AZ ? soundTips(v.t) : ''}
     ${breakdown(v.br)}
+    ${exampleLine(v)}
   </div>
   ${v.note ? callout('tip', 'Gut zu wissen', v.note) : ''}`;
 }
@@ -190,17 +194,17 @@ function chooseCard(c) {
         </div>
         ${S.reveal ? `<div class="prompt-mid az" style="margin-top:14px">${esc(c.prompt)}</div>${c.item?.ph ? phon(c.item.ph) : ''}` : ''}
       </div>`;
-  } else if (c.promptKind === 'az') {
+  } else if (c.promptKind === 't') {
     head = `<div class="q">${icon('help')}Was bedeutet das?</div>
       <div class="card row" style="gap:14px">
         ${speakBtn(c.prompt)}
         <div class="grow"><div class="prompt-mid az">${esc(c.prompt)}</div>${store.settings.showPhonetic ? phon(c.item?.ph) : ''}</div>
       </div>`;
   } else {
-    head = `<div class="q">${icon('chat')}Wie sagt man das auf Aserbaidschanisch?</div>
+    head = `<div class="q">${icon('chat')}Wie sagt man das auf ${PACK.name}?</div>
       <div class="card"><div class="prompt-mid">${esc(c.prompt)}</div></div>`;
   }
-  return head + optionsHtml(c.options.map(o => ({ label: o, value: o })), c.optionLang === 'az');
+  return head + optionsHtml(c.options.map(o => ({ label: o, value: o })), c.optionLang === 't');
 }
 
 function optionsHtml(options, azStyle) {
@@ -209,6 +213,12 @@ function optionsHtml(options, azStyle) {
       <span class="k">${n + 1}</span>
       <span class="grow${azStyle ? ' az' : ''}">${esc(o.label)}</span>
     </button>`).join('')}</div>`;
+}
+
+function gapCard(c) {
+  return `<div class="q">${icon('parts')}Welcher Ausdruck passt in die Lücke?</div>
+    <div class="card gap-sentence">${esc(c.before)}<span class="gap">${S.answered ? esc(c.answer) : '&nbsp;'}</span>${esc(c.after)}</div>
+    ${optionsHtml(c.options.map(o => ({ label: o, value: o })), true)}`;
 }
 
 function buildCard(c) {
@@ -226,15 +236,15 @@ function answerLineHtml() {
 
 function typeCard(c) {
   const hintText = S.hints ? typedHintPrefix(c) : '';
-  return `<div class="q">${icon('keyboard')}Schreib es auf Aserbaidschanisch</div>
+  return `<div class="q">${icon('keyboard')}Schreib es auf ${PACK.name}</div>
     <div class="card"><div class="prompt-mid">${esc(c.prompt)}</div></div>
     <div class="type-wrap">
       <input class="type-in" id="type-in" autocapitalize="off" autocorrect="off" autocomplete="off"
-             spellcheck="false" placeholder="Deine Antwort" enterkeyhint="done" lang="az"
+             spellcheck="false" placeholder="Deine Antwort" enterkeyhint="done" lang="${PACK.id}"
              value="${esc(S.typed || '')}" ${S.answered ? 'disabled' : ''}>
     </div>
     ${hintText ? `<div class="hint-line">${icon('bulb')}Beginnt mit „${esc(hintText)}…“</div>` : ''}
-    ${S.answered ? '' : `<div class="keys">${AZ_KEYS.map(k => `<button data-key="${k}" aria-label="${k} einfügen">${k}</button>`).join('')}</div>`}`;
+    ${S.answered || !IS_AZ ? '' : `<div class="keys">${AZ_KEYS.map(k => `<button data-key="${k}" aria-label="${k} einfügen">${k}</button>`).join('')}</div>`}`;
 }
 
 function typedHintPrefix(c) {
@@ -285,10 +295,10 @@ function dialogCard(c) {
     <p class="sub" style="margin-bottom:14px">${esc(d.intro)}</p>
     <div class="card">
       ${d.lines.map(l => `<div class="dl ${l.who === 'Du' ? 'me' : ''}">
-        ${speakBtn(l.az, { voice: l.who === 'Du' ? undefined : d.voices?.[l.who] })}
+        ${speakBtn(l.t, { voice: l.who === 'Du' ? undefined : d.voices?.[l.who] })}
         <div class="bubble">
           <div class="who">${esc(l.who)}</div>
-          <div class="az">${esc(l.az)}</div>
+          <div class="az">${esc(l.t)}</div>
           <div class="de">${esc(l.de)}</div>
         </div>
       </div>`).join('')}
@@ -301,10 +311,10 @@ function summaryHtml() {
   store.completeLesson(S.id, pct);
   store.addXp(S.xp);
   const next = nextLessonAfter(S.id);
-  const [medal, title, sub] = pct >= 90 ? ['trophy', 'Əla! Hervorragend!', '']
+  const [medal, title, sub] = pct >= 90 ? ['trophy', IS_AZ ? 'Əla! Hervorragend!' : 'Outstanding!', '']
     : pct >= 70 ? ['star', 'Sehr gut!', 'good']
     : ['target', 'Geschafft!', 'brand'];
-  const missed = [...new Map(S.missed.map(v => [v.az, v])).values()].slice(0, 6);
+  const missed = [...new Map(S.missed.map(v => [v.t, v])).values()].slice(0, 6);
   return `<div class="view" style="padding-bottom:30px">
     <div class="done-hero">
       <div class="medal pop ${sub}">${icon(medal)}</div>
@@ -317,8 +327,8 @@ function summaryHtml() {
       <div class="box"><b>${store.stats.streak}</b><span>${store.stats.streak === 1 ? 'Tag' : 'Tage'} in Folge</span></div>
     </div>
     ${missed.length ? `<h2>Das schaust du dir besser noch mal an</h2>
-      <div class="card">${missed.map(v => `<div class="vocab-item">${speakBtn(v.az)}
-        <div class="grow"><div class="az">${esc(v.az)}</div><div class="de">${esc(v.de)}</div></div></div>`).join('')}</div>` : ''}
+      <div class="card">${missed.map(v => `<div class="vocab-item">${speakBtn(v.t)}
+        <div class="grow"><div class="az">${esc(v.t)}</div><div class="de">${esc(v.de)}</div></div></div>`).join('')}</div>` : ''}
     ${first && S.xp ? callout('info', 'So geht es weiter', 'Die neuen Wörter kommen in den nächsten Tagen automatisch zur Wiederholung – genau dann, wenn du sie sonst vergessen würdest.') : ''}
     <div class="stack" style="margin-top:14px">
       ${next ? `<a class="btn primary block" href="#/lesson/${next}">Nächste Lektion ${icon('arrowR')}</a>` : ''}
@@ -352,7 +362,7 @@ function repaint() {
 function autoPlay() {
   if (S.i >= S.cards.length || !store.settings.autoPlay) return;
   const c = S.cards[S.i];
-  const text = c.type === 'intro' ? c.item.az
+  const text = c.type === 'intro' ? c.item.t
     : c.type === 'letter-intro' ? c.letter.ex
     : c.type === 'letter-word' ? c.audio
     : (c.type === 'choose' && c.promptKind === 'audio') ? c.prompt
@@ -441,7 +451,7 @@ function wireType(root) {
 /* -------------------------------------------------------------------- Tipps */
 
 function hintsLeft(c) {
-  if (c.type === 'choose' || c.type === 'letter-pick' || c.type === 'letter-word') {
+  if (c.type === 'choose' || c.type === 'gap' || c.type === 'letter-pick' || c.type === 'letter-word') {
     const max = c.promptKind === 'audio' ? 2 : 1;   // 50:50, beim Hören zusätzlich: Wort zeigen
     return max - S.hints;
   }
@@ -460,7 +470,7 @@ function useHint() {
   const c = S.cards[S.i];
   if (S.answered || hintsLeft(c) <= 0) return;
   buzz(6);
-  if (c.type === 'choose' || c.type === 'letter-pick' || c.type === 'letter-word') {
+  if (c.type === 'choose' || c.type === 'gap' || c.type === 'letter-pick' || c.type === 'letter-word') {
     if (S.hints === 0) {
       const values = c.type === 'letter-pick' ? c.options.map(o => o.value) : c.options;
       S.gone = values.filter(v => v !== c.answer).sort(() => Math.random() - .5).slice(0, 2);
@@ -496,7 +506,7 @@ function finish(result) {
   const c = S.cards[S.i];
   const ok = result !== 'no';
   if (ok) { S.right++; S.xp += (S.hints || result === 'close') ? 1 : 2; }
-  else if (c.item?.az && c.item?.de) S.missed.push(c.item);
+  else if (c.item?.t && c.item?.de) S.missed.push(c.item);
   buzz(ok ? 8 : [12, 40, 12]);
 
   const id = c.item?.id;

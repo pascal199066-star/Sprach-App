@@ -5,10 +5,16 @@
  * benutzt – beide müssen für denselben Text denselben Namen berechnen.
  */
 
-/** Stimmen, für die Aufnahmen erzeugt werden. */
+/** Stimmen je Sprache, für die Aufnahmen erzeugt werden. */
 export const VOICES = {
-  f: { id: 'az-AZ-BanuNeural',  label: 'Banu',  desc: 'Frauenstimme' },
-  m: { id: 'az-AZ-BabekNeural', label: 'Babək', desc: 'Männerstimme' }
+  az: {
+    f: { id: 'az-AZ-BanuNeural',  label: 'Banu',   desc: 'Frauenstimme' },
+    m: { id: 'az-AZ-BabekNeural', label: 'Babək',  desc: 'Männerstimme' }
+  },
+  en: {
+    f: { id: 'en-GB-SoniaNeural', label: 'Sonia',  desc: 'britisch' },
+    m: { id: 'en-US-AndrewNeural', label: 'Andrew', desc: 'amerikanisch' }
+  }
 };
 
 /** Leerraum vereinheitlichen, damit „Salam “ und „Salam“ dieselbe Datei treffen. */
@@ -38,7 +44,8 @@ function fnv1a(str) {
   return h.toString(16).padStart(8, '0');
 }
 
-/** Relativer Pfad der Aufnahme, z. B. „f/1a2b3c4d“. */
-export function audioKey(text, voice = 'f') {
-  return `${voice}/${fnv1a(cleanText(text))}`;
+/** Relativer Pfad der Aufnahme, z. B. „f/1a2b3c4d“ (Aserbaidschanisch) oder „en-f/1a2b3c4d“. */
+export function audioKey(text, voice = 'f', lang = 'az') {
+  const dir = lang === 'az' ? voice : `${lang}-${voice}`;
+  return `${dir}/${fnv1a(cleanText(text))}`;
 }

@@ -1,4 +1,5 @@
 /** Fortschritt & Einstellungen – lokal im Gerät, nichts verlässt das iPhone. */
+import { LANG } from './lang.js';
 
 const KEY = 'azaz.state.v1';
 
@@ -17,22 +18,36 @@ const DEFAULTS = {
   stats: { streak: 0, best: 0, lastDay: null, totalXp: 0, days: {} }
 };
 
-function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+/*
+ * Lektionen und Karteikasten gehören zur jeweiligen Sprache, Einstellungen,
+ * Streak und XP sind gemeinsam. Aserbaidschanisch liegt aus Kompatibilität
+ * weiter direkt unter `lessons`/`srs`, weitere Sprachen unter `courses[lang]`.
+ * Im Speicher zeigen `state.lessons`/`state.srs` immer auf die aktive Sprache.
+ */
+let raw = {};
 
 function load() {
   try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return clone(DEFAULTS);
-    const parsed = JSON.parse(raw);
-    return {
-      settings: { ...DEFAULTS.settings, ...(parsed.settings || {}) },
-      lessons: parsed.lessons || {},
-      srs: parsed.srs || {},
-      stats: { ...DEFAULTS.stats, ...(parsed.stats || {}) }
-    };
+    raw = JSON.parse(localStorage.getItem(KEY) || '{}') || {};
   } catch {
-    return clone(DEFAULTS);
+    raw = {};
   }
+  const course = LANG === 'az' ? raw : (raw.courses?.[LANG] || {});
+  return {
+    settings: { ...DEFAULTS.settings, ...(raw.settings || {}) },
+    lessons: course.lessons || {},
+    srs: course.srs || {},
+    stats: { ...DEFAULTS.stats, ...(raw.stats || {}) }
+  };
+}
+
+/** Den aktuellen Stand in die Speicherform zurückschreiben. */
+function serialize() {
+  const out = { ...raw, settings: state.settings, stats: state.stats, courses: { ...(raw.courses || {}) } };
+  if (LANG === 'az') { out.lessons = state.lessons; out.srs = state.srs; }
+  else out.courses[LANG] = { lessons: state.lessons, srs: state.srs };
+  return out;
 }
 
 let state = load();
@@ -42,7 +57,7 @@ const subs = new Set();
 function persist() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    try { raw = serialize(); localStorage.setItem(KEY, JSON.stringify(raw)); }
     catch (e) { console.warn('Speichern fehlgeschlagen', e); }
   }, 120);
   subs.forEach(fn => fn(state));
@@ -107,13 +122,14 @@ export const store = {
     persist();
   },
 
+  /** Lernstand der aktiven Sprache löschen (Einstellungen und Streak bleiben). */
   reset() {
-    state = clone(DEFAULTS);
-    try { localStorage.removeItem(KEY); } catch { /* egal */ }
+    state.lessons = {};
+    state.srs = {};
     persist();
   },
 
-  export() { return JSON.stringify(state); }
+  export() { return JSON.stringify(serialize()); }
 };
 
 store.refreshStreak();

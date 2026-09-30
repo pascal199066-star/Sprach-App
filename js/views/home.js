@@ -1,10 +1,10 @@
 /** Startseite: Weiterlernen, Tagesziel, fällige Wiederholungen und der Lernpfad. */
-import { UNITS } from '../../data/course.js';
+import { UNITS, PACK } from '../../data/active.js';
 import { store } from '../store.js';
 import { dueCount, learnedCount } from '../srs.js';
-import { VOCAB } from '../../data/vocab.js';
+import { VOCAB } from '../../data/active.js';
 import { esc, fmtInt } from '../ui.js';
-import { progressBar, icon, ring, BUTA, callout } from '../components.js';
+import { progressBar, icon, ring, BUTA, callout, langSwitch } from '../components.js';
 import { speech } from '../speech.js';
 
 export const KIND = {
@@ -27,6 +27,7 @@ function nextLesson() {
 
 function greetingWord() {
   const h = new Date().getHours();
+  if (PACK.id === 'en') return h < 12 ? 'Good morning' : h >= 18 ? 'Good evening' : 'Good afternoon';
   return h < 11 ? 'Sabahınız xeyir' : h >= 18 ? 'Axşamınız xeyir' : 'Salam';
 }
 
@@ -44,20 +45,22 @@ export function render() {
 
   return `<div class="view">
     <div class="home-top">
-      <div class="brandmark" aria-hidden="true">ə</div>
+      <div class="brandmark${PACK.mark.length > 1 ? ' wide' : ''}" aria-hidden="true">${esc(PACK.mark)}</div>
       <div class="grow">
         <div class="eyebrow">${esc(greetingWord())}${name ? ',' : ''}</div>
-        <h1>${name ? esc(name) : 'Azərbaycanca'}</h1>
+        <h1>${name ? esc(name) : esc(PACK.title)}</h1>
       </div>
       <div class="pill fire${streak ? '' : ' off'}" title="Tage in Folge">${icon('flame')}${streak}</div>
     </div>
+
+    ${langSwitch(PACK.id)}
 
     ${voiceNotice()}
 
     ${next ? heroCard(next, doneCount) : `<div class="hero">
         ${BUTA}
         <div class="eyebrow">Kurs abgeschlossen</div>
-        <h2>Əla! Alle ${allLessons.length} Lektionen geschafft.</h2>
+        <h2>${PACK.id === 'en' ? 'Well done!' : 'Əla!'} Alle ${allLessons.length} Lektionen geschafft.</h2>
         <p>Halte dein Wissen mit den Wiederholungen frisch – oder übe die Dialoge noch einmal.</p>
         <a class="btn white block" href="#/practice">${icon('repeat')} Wiederholen</a>
       </div>`}
@@ -97,7 +100,7 @@ function voiceNotice() {
   if (!speech.supported) {
     return callout('warn', 'Keine Sprachausgabe', 'Dieser Browser kann nichts vorlesen. Am besten Safari verwenden.');
   }
-  if (q === 'none') {
+  if (q === 'none' && PACK.id === 'az') {
     return callout('warn', 'Keine Stimme gefunden', 'Unter **Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Türkisch** eine Stimme laden – als Notlösung, bis die Aufnahmen da sind.');
   }
   return '';

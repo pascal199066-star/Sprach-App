@@ -1,8 +1,8 @@
 /** Statistik: was in den letzten Wochen passiert ist. */
 import { store } from '../store.js';
 import { learnedCount, dueCount, strength } from '../srs.js';
-import { VOCAB, CATEGORIES, vocabByCat } from '../../data/vocab.js';
-import { UNITS } from '../../data/course.js';
+import { VOCAB, CATEGORIES, vocabByCat } from '../../data/active.js';
+import { UNITS } from '../../data/active.js';
 import { fmtInt, esc } from '../ui.js';
 import { backBar, progressBar, icon } from '../components.js';
 

@@ -1,15 +1,20 @@
 /**
  * Sprachausgabe.
  *
- * 1. Wahl: echte aserbaidschanische Aufnahmen (audio/…/*.mp3), einmalig mit
- *    den neuronalen az-AZ-Stimmen erzeugt (siehe tools/). Sie liegen in der
- *    App selbst und funktionieren offline.
- * 2. Wahl: eine aserbaidschanische Systemstimme, falls das Gerät eine hat.
- * 3. Notlösung: die türkische Systemstimme. Sie kennt ə, q und x nicht,
- *    deshalb wird der Text vorher angenähert – das klingt aber hörbar
- *    türkisch und ist nur ein Behelf, solange keine Aufnahme da ist.
+ * 1. Wahl: fertige Aufnahmen (audio/…/*.mp3) der aktiven Sprache, einmalig mit
+ *    neuronalen Stimmen erzeugt (siehe tools/). Sie liegen in der App selbst
+ *    und funktionieren offline.
+ * 2. Wahl: eine Systemstimme der Zielsprache, falls das Gerät eine hat
+ *    (für Englisch fast immer der Fall).
+ * 3. Notlösung fürs Aserbaidschanische: die türkische Systemstimme. Sie kennt
+ *    ə, q und x nicht, deshalb wird der Text vorher angenähert – das klingt
+ *    hörbar türkisch und ist nur ein Behelf, solange keine Aufnahme da ist.
  */
-import { audioKey, spokenText, VOICES } from './audio-key.js';
+import { audioKey as keyFor, spokenText, VOICES } from './audio-key.js';
+import { LANG } from './lang.js';
+
+const audioKey = (text, voice) => keyFor(text, voice, LANG);
+const PREFIX = LANG === 'az' ? /^[fm]\// : new RegExp(`^${LANG}-[fm]/`);
 
 const AZ_TO_TR = { 'ə': 'e', 'Ə': 'E', 'q': 'g', 'Q': 'G', 'x': 'h', 'X': 'H' };
 
@@ -49,12 +54,12 @@ export const speech = {
     return String(text).replace(/[əƏqQxX]/g, c => AZ_TO_TR[c]);
   },
 
-  /** Systemstimmen, die für Aserbaidschanisch in Frage kommen – beste zuerst. */
+  /** Systemstimmen, die für die Zielsprache in Frage kommen – beste zuerst. */
   candidates() {
     const score = v => {
       const l = (v.lang || '').toLowerCase().replace('_', '-');
-      if (l.startsWith('az')) return 0;
-      if (l.startsWith('tr')) return 1;
+      if (l.startsWith(LANG)) return l === 'en-gb' ? -1 : 0;
+      if (LANG === 'az' && l.startsWith('tr')) return 1;
       return 9;
     };
     return voices.filter(v => score(v) < 9).sort((a, b) => score(a) - score(b));
@@ -71,15 +76,15 @@ export const speech = {
 
   /** Wie gut ist die Aussprache gerade? */
   get quality() {
-    if (recorded && recorded.size) return 'recorded';
+    if (this.recordedCount) return 'recorded';
     const v = this.current();
     if (!v) return 'none';
     const l = (v.lang || '').toLowerCase();
-    return l.startsWith('az') ? 'native' : l.startsWith('tr') ? 'turkish' : 'fallback';
+    return l.startsWith(LANG) ? 'native' : l.startsWith('tr') ? 'turkish' : 'fallback';
   },
 
   /** Anzahl der mitgelieferten Aufnahmen (0 = keine). */
-  get recordedCount() { return recorded ? recorded.size : 0; },
+  get recordedCount() { return recorded ? [...recorded].filter(k => PREFIX.test(k)).length : 0; },
 
   /** Gibt es für diesen Text eine echte Aufnahme? */
   hasRecording(text, voice = preferred) {
@@ -87,10 +92,10 @@ export const speech = {
   },
 
   /** Pfade aller Aufnahmen – für „offline speichern“. */
-  allRecordings() { return recorded ? [...recorded].map(k => `audio/${k}.mp3`) : []; },
+  allRecordings() { return recorded ? [...recorded].filter(k => PREFIX.test(k)).map(k => `audio/${k}.mp3`) : []; },
 
   setVoice(uri) { chosen = uri || null; },
-  setPreferred(v) { if (VOICES[v]) preferred = v; },
+  setPreferred(v) { if (VOICES[LANG][v]) preferred = v; },
   get preferred() { return preferred; },
 
   onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
@@ -173,10 +178,10 @@ function sayWithSystem(text, opts, done) {
     window.dispatchEvent(new CustomEvent('speech:novoice'));
   }
   try { speechSynthesis.cancel(); } catch { /* egal */ }
-  const native = (voice?.lang || '').toLowerCase().startsWith('az');
+  const native = (voice?.lang || '').toLowerCase().startsWith(LANG);
   const spoken = spokenText(text);
-  const u = new SpeechSynthesisUtterance(native ? spoken : speech.toTurkish(spoken));
-  if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'tr-TR'; }
+  const u = new SpeechSynthesisUtterance(native || LANG !== 'az' ? spoken : speech.toTurkish(spoken));
+  if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = LANG === 'az' ? 'tr-TR' : 'en-GB'; }
   const rate = opts.rate ?? 0.9;
   u.rate = Math.max(0.3, Math.min(1.2, opts.slow ? rate * 0.6 : rate));
   u.onend = done;

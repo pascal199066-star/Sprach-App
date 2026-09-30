@@ -6,15 +6,13 @@
  * Gegenseite (Übersetzung). So kann die App nach einem Fehler zeigen,
  * was die gewählte Antwort eigentlich bedeutet.
  */
-import { VOCAB, VOCAB_BY_ID, vocabByCat } from '../data/vocab.js';
-import { ALPHABET } from '../data/alphabet.js';
-import { GRAMMAR_BY_ID } from '../data/grammar.js';
-import { DIALOG_BY_ID } from '../data/dialogues.js';
-import { LESSON_BY_ID, unitItems } from '../data/course.js';
+import {
+  VOCAB, VOCAB_BY_ID, vocabByCat, ALPHABET, GRAMMAR_BY_ID, DIALOG_BY_ID, LESSON_BY_ID, unitItems, PACK
+} from '../data/active.js';
 import { shuffle, sample, pick } from './ui.js';
 import { strength } from './srs.js';
 
-const isPhrase = v => v.az.trim().includes(' ');
+const isPhrase = v => v.t.trim().includes(' ');
 
 /** Drei plausible falsche Antworten – bevorzugt aus derselben Kategorie, ohne Dubletten. */
 function distractors(item, field, n = 3) {
@@ -34,33 +32,74 @@ function distractors(item, field, n = 3) {
 }
 
 function chooseEx(item, promptKind) {
-  // promptKind: 'az' (Wort zeigen → Deutsch wählen) | 'de' | 'audio'
-  const field = promptKind === 'de' ? 'az' : 'de';
-  const back = field === 'az' ? 'de' : 'az';
+  // promptKind: 't' (Zielsprache zeigen → Deutsch wählen) | 'de' | 'audio'
+  const field = promptKind === 'de' ? 't' : 'de';
+  const back = field === 't' ? 'de' : 't';
   const wrong = distractors(item, field);
   const all = [item, ...wrong];
   return {
     type: 'choose',
     promptKind,
-    prompt: promptKind === 'de' ? item.de : item.az,
+    prompt: promptKind === 'de' ? item.de : item.t,
     answer: item[field],
     options: shuffle(all.map(v => v[field])),
     alts: Object.fromEntries(all.map(v => [v[field], v[back]])),
-    optionLang: field === 'az' ? 'az' : 'de',
+    optionLang: field === 't' ? 't' : 'de',
     item
   };
 }
 
+/** Was in der Lückenübung fehlt: `blank` oder der Ausdruck ohne „to“ und „…“. */
+function gapTarget(v) {
+  return (v.blank || v.t.replace(/^to /, '').replace(/\s*\(.*?\)/g, '').replace(/[\s…?.!,]+$/, '')).trim();
+}
+
+/** Groß-/Kleinschreibung einer Auswahl an die Lösung angleichen. */
+function matchCase(word, model) {
+  if (/^I\b/.test(word)) return word;
+  const up = model[0] === model[0].toUpperCase() && model[0] !== model[0].toLowerCase();
+  return (up ? word[0].toUpperCase() : word[0].toLowerCase()) + word.slice(1);
+}
+
+/** Lückensatz: der Beispielsatz mit einer Lücke, vier Ausdrücke zur Wahl. */
+function gapEx(item) {
+  if (!item.ex) return null;
+  const target = gapTarget(item);
+  const i = item.ex.toLowerCase().indexOf(target.toLowerCase());
+  if (!target || i < 0) return null;
+  const answer = item.ex.slice(i, i + target.length);
+  const alts = { [answer]: item.de };
+  const options = [answer];
+  for (const v of distractors(item, 't', 8)) {
+    const o = matchCase(gapTarget(v), answer);
+    if (options.length >= 4 || options.some(x => x.toLowerCase() === o.toLowerCase())) continue;
+    options.push(o);
+    alts[o] = v.de;
+  }
+  return {
+    type: 'gap',
+    before: item.ex.slice(0, i),
+    after: item.ex.slice(i + target.length),
+    answer,
+    options: shuffle(options),
+    alts,
+    item
+  };
+}
+
+/** Satzbau nur für Sätze ohne Platzhalter und nicht zu lang. */
+const buildable = v => !v.t.includes('…') && v.t.split(/\s+/).length <= 9;
+
 function buildEx(item) {
-  const words = item.az.split(/\s+/);
+  const words = item.t.split(/\s+/);
   const extras = sample(
-    VOCAB.filter(v => v.id !== item.id && !isPhrase(v) && !words.includes(v.az)).map(v => v.az),
+    VOCAB.filter(v => v.id !== item.id && !isPhrase(v) && !words.includes(v.t)).map(v => v.t),
     Math.min(3, Math.max(1, 6 - words.length))
   );
   return {
     type: 'build',
     prompt: item.de,
-    answer: item.az,
+    answer: item.t,
     words,
     tokens: shuffle([...words, ...extras]),
     item
@@ -68,14 +107,18 @@ function buildEx(item) {
 }
 
 function typeEx(item) {
-  return { type: 'type', prompt: item.de, answer: item.az, item };
+  return { type: 'type', prompt: item.de, answer: item.t.replace(/^to /, ''), item };
 }
 
 /** Übungsmix für ein einzelnes Wort. */
 function exercisesFor(item) {
-  const out = [chooseEx(item, 'az'), chooseEx(item, 'audio')];
-  if (isPhrase(item)) out.push(buildEx(item));
-  else { out.push(chooseEx(item, 'de')); out.push(typeEx(item)); }
+  const out = [chooseEx(item, 't'), chooseEx(item, 'audio')];
+  const gap = gapEx(item);
+  if (gap) out.push(gap);
+  // Im Englischen ist das aktive Erinnern (Deutsch → Englisch) die eigentliche Übung
+  if (PACK.id === 'en' || !isPhrase(item)) out.push(chooseEx(item, 'de'));
+  if (!isPhrase(item)) out.push(typeEx(item));
+  else if (buildable(item)) out.push(buildEx(item));
   return out;
 }
 
@@ -131,11 +174,11 @@ export function buildLesson(lessonId) {
       const others = sample(d.lines.filter(x => x.de !== line.de), 3);
       const all = [line, ...others];
       cards.push({
-        type: 'choose', promptKind: 'audio', prompt: line.az,
+        type: 'choose', promptKind: 'audio', prompt: line.t,
         voice: line.who === 'Du' ? undefined : d.voices?.[line.who],
         answer: line.de, options: shuffle(all.map(x => x.de)),
-        alts: Object.fromEntries(all.map(x => [x.de, x.az])),
-        optionLang: 'de', item: { az: line.az, de: line.de, id: 'dlg:' + d.id }
+        alts: Object.fromEntries(all.map(x => [x.de, x.t])),
+        optionLang: 'de', item: { t: line.t, de: line.de, id: 'dlg:' + d.id }
       });
     });
     return { lesson, cards };
